@@ -1,19 +1,30 @@
 import { Search, ShoppingCart, User } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import MegaMenu from "./MegaMenu";
 
 const Header = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
   return (
     <header className="border-b border-border">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 relative">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="text-xl font-bold">
             LOGO
           </Link>
           
           <nav className="hidden md:flex items-center gap-8">
-            <Link to="/" className="text-sm hover:opacity-70 transition-opacity border-b-2 border-primary pb-1">
-              Каталог
-            </Link>
+            <div
+              className="relative"
+              onMouseEnter={() => setMenuOpen(true)}
+            >
+              <Link
+                to="/"
+                className="text-sm hover:opacity-70 transition-opacity border-b-2 border-primary pb-1"
+              >
+                Каталог
+              </Link>
+            </div>
             <Link to="/about" className="text-sm hover:opacity-70 transition-opacity">
               О нас
             </Link>
@@ -37,6 +48,7 @@ const Header = () => {
             </Link>
           </div>
         </div>
+        <MegaMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
       </div>
     </header>
   );

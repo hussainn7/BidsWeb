@@ -11,7 +11,7 @@ const About = () => {
         
         <div className="max-w-3xl space-y-6 text-sm leading-relaxed">
           <p>
-            Мы любим создавать Lovable. Наукоград!
+            Мы создаем качественные продукты для ваших ежедневных задач.
           </p>
           
           <p>
