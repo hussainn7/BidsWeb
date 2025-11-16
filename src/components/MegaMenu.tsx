@@ -4,19 +4,15 @@ import { Link } from "react-router-dom";
 const columns = [
   {
     title: "Раздел",
-    items: ["Подраздел 1", "Подраздел 2", "Подраздел 3", "Подраздел 4", "Подраздел 5"],
+    items: ["Подраздел", "Подраздел", "Подраздел", "Подраздел", "Подраздел"],
   },
   {
     title: "Раздел",
-    items: ["Подраздел 1", "Подраздел 2", "Подраздел 3", "Подраздел 4", "Подраздел 5"],
+    items: ["Подраздел", "Подраздел", "Подраздел", "Подраздел", "Подраздел"],
   },
   {
     title: "Раздел",
-    items: ["Подраздел 1", "Подраздел 2", "Подраздел 3", "Подраздел 4", "Подраздел 5"],
-  },
-  {
-    title: "Раздел",
-    items: ["Подраздел 1", "Подраздел 2", "Подраздел 3", "Подраздел 4", "Подраздел 5"],
+    items: ["Подраздел", "Подраздел", "Подраздел", "Подраздел", "Подраздел"],
   },
 ];
 
@@ -32,20 +28,26 @@ const MegaMenu = ({ open, onClose }: MegaMenuProps) => {
     <div
       ref={panelRef}
       className={
-        "absolute left-0 right-0 top-full z-40 bg-popover border border-border shadow-md" +
+        "absolute left-1/2 top-full mt-1 z-40 w-[640px] -translate-x-1/2 bg-white border border-border shadow-md" +
         (open ? " block" : " hidden")
       }
       onMouseLeave={onClose}
     >
-      <div className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <div className="px-8 py-6">
+        <div className="grid grid-cols-3 gap-8">
           {columns.map((col, idx) => (
-            <div key={idx}>
+            <div
+              key={idx}
+              className={idx !== columns.length - 1 ? "pr-8 border-r border-border" : "pl-2"}
+            >
               <div className="text-sm mb-3 text-foreground">{col.title}</div>
               <ul className="space-y-2">
                 {col.items.map((item, i) => (
                   <li key={i}>
-                    <Link to="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    <Link
+                      to="#"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
                       {item}
                     </Link>
                   </li>

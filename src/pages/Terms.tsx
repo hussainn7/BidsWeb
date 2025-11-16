@@ -7,7 +7,7 @@ const Terms = () => {
       <Header />
       
       <main className="flex-1 container mx-auto px-4 py-12">
-        <h1 className="text-2xl font-medium mb-8">Условия использования</h1>
+        <h1 className="text-2xl font-medium mb-8">Договор оферты</h1>
         
         <div className="max-w-3xl space-y-6 text-sm leading-relaxed text-muted-foreground">
           <p>

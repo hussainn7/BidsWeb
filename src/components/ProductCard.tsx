@@ -13,30 +13,34 @@ interface ProductCardProps {
 const ProductCard = ({ id, title, price, discount, username }: ProductCardProps) => {
   return (
     <Link to={`/product/${id}`} className="group">
-      <div className="space-y-3">
-        <div className="aspect-square bg-muted rounded-none overflow-hidden">
-          <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300" />
+      <div className="flex flex-col items-center text-center space-y-4">
+        {/* Image placeholder */}
+        <div className="w-full aspect-square bg-gray-200 rounded-lg overflow-hidden">
+          <div className="w-full h-full bg-gray-200" />
         </div>
-        
-        <div className="space-y-2">
-          <h3 className="text-sm">{title}</h3>
-          <div className="text-sm font-medium">{price}</div>
-          
-          <Button 
-            variant="secondary" 
-            className="w-full"
-            onClick={(e) => {
-              e.preventDefault();
-              // Handle bid
-            }}
-          >
-            Предложение
-          </Button>
-          
-          <div className="text-xs text-muted-foreground space-y-1">
-            <div>Наибольшая ставка · {username || "Имя пользователя"}</div>
-            <div>Розничная цена: {discount || "2844 ₽"}</div>
-          </div>
+
+        {/* Title */}
+        <h3 className="text-sm">{title}</h3>
+
+        {/* Timer */}
+        <div className="text-sm font-semibold">{price}</div>
+
+        {/* Action button */}
+        <Button
+          variant="secondary"
+          className="w-40 bg-gray-400 text-white hover:bg-gray-400/90"
+          onClick={(e) => {
+            e.preventDefault();
+            // Handle bid
+          }}
+        >
+          Предложение
+        </Button>
+
+        {/* Bid and price info */}
+        <div className="text-xs text-muted-foreground space-y-1">
+          <div>Наибольшая ставка : {username || "Имя пользователя"}</div>
+          <div className="font-semibold">Розничная цена: {discount || "2844 ₽"}</div>
         </div>
       </div>
     </Link>

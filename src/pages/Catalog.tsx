@@ -22,7 +22,7 @@ const Catalog = () => {
       <CategoryTabs />
       
       <main className="flex-1 container mx-auto px-4">
-        <h1 className="text-2xl font-medium mb-8">Раздел</h1>
+        <h1 className="text-2xl font-medium mb-6">Раздел</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
           {mockProducts.map((product) => (
