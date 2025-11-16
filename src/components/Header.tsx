@@ -22,7 +22,7 @@ const Header = () => {
   };
 
   return (
-    <header className="border-b border-border bg-background/80 backdrop-blur-md">
+    <header className="relative z-50 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="container mx-auto px-4 relative">
         <div className="flex items-center h-16 border-b border-border/70">
           {/* Logo left */}
@@ -55,7 +55,7 @@ const Header = () => {
                 return (
                   <div
                     key={link.path}
-                    className="relative"
+                    className="relative z-50"
                     onMouseEnter={() => setMenuOpen(true)}
                     onMouseLeave={() => setMenuOpen(false)}
                   >

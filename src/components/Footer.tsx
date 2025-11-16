@@ -21,21 +21,21 @@ const Footer = () => {
           <Link to="/shipping" className="text-muted-foreground hover:text-foreground transition-colors">
             Доставка и оплата
           </Link>
-          <Link to="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
+          {/* <Link to="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
             Правила возврата
-          </Link>
+          </Link> */}
           <Link to="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
             Договор оферты
           </Link>
         </div>
 
         {/* Second line: privacy policy */}
-        <div className="text-sm text-muted-foreground mb-8">
+        {/* <div className="text-sm text-muted-foreground mb-8">
           Политика конфиденциальности
-        </div>
+        </div> */}
 
         {/* Payment icons centered */}
-        <div className="flex justify-center gap-6">
+        <div className="flex justify-center gap-6 mt-8">
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg"
             alt="Visa"

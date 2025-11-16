@@ -29,7 +29,7 @@ const MegaMenu = ({ open, onClose }: MegaMenuProps) => {
   return (
     <div
       ref={panelRef}
-      className="absolute left-1/2 top-full mt-1 z-40 w-[640px] -translate-x-1/2 bg-white border border-border shadow-md"
+      className="absolute left-1/2 top-full mt-1 z-[60] w-[640px] -translate-x-1/2 bg-white border border-border shadow-lg"
       onMouseEnter={() => {}} // Keep menu open when hovering over it
       onMouseLeave={onClose}
     >
