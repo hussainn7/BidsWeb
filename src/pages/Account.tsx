@@ -1,7 +1,11 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const mockOrders = [
   { id: "000000", name: "Товар", date: "Ноябрь 24,2020", status: "В доставке", price: "2644 ₽" },
@@ -10,6 +14,34 @@ const mockOrders = [
 ];
 
 const Account = () => {
+  const navigate = useNavigate();
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("orders");
+
+  useEffect(() => {
+    // Check if user is authenticated
+    const isAuthenticated = localStorage.getItem('isAuthenticated');
+    const email = localStorage.getItem('userEmail');
+    
+    if (!isAuthenticated || !email) {
+      toast.error("Пожалуйста, войдите в систему");
+      navigate('/login');
+      return;
+    }
+    
+    setUserEmail(email);
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userEmail');
+    toast.success("Вы успешно вышли из системы");
+    navigate('/login');
+  };
+
+  if (!userEmail) {
+    return null; // or a loading spinner
+  }
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -17,9 +49,18 @@ const Account = () => {
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="rounded-lg border border-border/60 bg-white shadow-sm p-8">
-            <h1 className="text-3xl font-bold mb-8">МОЙ АККАУНТ</h1>
+            <div className="flex justify-between items-center mb-8">
+              <h1 className="text-3xl font-bold">МОЙ АККАУНТ</h1>
+              <Button 
+                variant="outline" 
+                className="border-border/60 hover:bg-destructive/10 hover:text-destructive"
+                onClick={handleLogout}
+              >
+                Выйти
+              </Button>
+            </div>
             
-            <Tabs defaultValue="orders">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="mb-8 bg-slate-50/50">
                 <TabsTrigger value="orders">Заказы</TabsTrigger>
                 <TabsTrigger value="address">Адрес</TabsTrigger>
@@ -73,11 +114,41 @@ const Account = () => {
               </TabsContent>
               
               <TabsContent value="data">
-                <div className="rounded-lg border border-border/60 bg-slate-50/50 p-6">
-                  <p className="text-sm text-muted-foreground">
-                    Персональные данные будут отображаться здесь.
-                  </p>
-                </div>
+                <Card className="border-border/60 bg-slate-50/50">
+                  <CardHeader>
+                    <CardTitle className="text-xl">Личная информация</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground mb-1">Email</p>
+                        <p className="text-foreground">{userEmail}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground mb-1">Имя</p>
+                        <p className="text-foreground">Не указано</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground mb-1">Телефон</p>
+                        <p className="text-foreground">Не указан</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground mb-1">Дата регистрации</p>
+                        <p className="text-foreground">18 ноября 2025</p>
+                      </div>
+                    </div>
+                    
+                    <div className="pt-4 border-t border-border/60">
+                      <Button 
+                        variant="outline" 
+                        className="border-blue-600 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                        onClick={() => setActiveTab('address')}
+                      >
+                        Редактировать адрес
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
               </TabsContent>
             </Tabs>
           </div>
