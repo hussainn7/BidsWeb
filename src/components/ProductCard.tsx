@@ -1,16 +1,44 @@
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
+import { usePriceVisibility } from "@/hooks/usePriceVisibility";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 interface ProductCardProps {
   id: number;
   image?: string;
   title: string;
-  price: string;      // e.g. "00:26" or "09:11" or "BID 1 200 ₽" – use however you want
+  price: number;      // Product price in rubles
+  minPrice: number;   // Minimum price for the product
   discount?: string;  // retail price
   username?: string;  // highest bidder
+  showPriceByDefault?: boolean; // For admin or special cases
 }
 
-const ProductCard = ({ id, image, title, price, discount, username }: ProductCardProps) => {
+const ProductCard = ({ id, image, title, price, minPrice, discount, username, showPriceByDefault = false }: ProductCardProps) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [showBuyButton, setShowBuyButton] = useState(false);
+  
+  const {
+    isPriceVisible,
+    showBuyButton: shouldShowBuyButton,
+    bonusRubles,
+    handlePriceClick,
+    applyBonus,
+    bonusExpiryDays
+  } = usePriceVisibility(id.toString());
+
+  // Apply bonus to price if available
+  const { finalPrice, discountApplied } = applyBonus(price, minPrice);
+  
+  // Format price for display
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('ru-RU', {
+      style: 'currency',
+      currency: 'RUB',
+      minimumFractionDigits: 0
+    }).format(price);
+  };
   return (
     <Link to={`/product/${id}`} className="group block h-full">
       <article
@@ -52,29 +80,97 @@ const ProductCard = ({ id, image, title, price, discount, username }: ProductCar
             {title}
           </h3>
 
-          {/* Timer */}
-          <div className="mt-4 text-lg font-bold text-foreground tracking-tight">
-            {price}
+          {/* Price Display */}
+          <div 
+            className={`
+              mt-4 text-lg font-bold tracking-tight cursor-pointer
+              ${isPriceVisible || showPriceByDefault ? 'text-foreground' : 'text-muted-foreground bg-muted/30 px-3 py-1.5 rounded-md inline-block'}
+              transition-colors duration-200
+            `}
+            onClick={() => {
+              if (!isPriceVisible) {
+                handlePriceClick();
+                if (bonusRubles > 0) {
+                  toast.success(`+${bonusRubles} бонусных рублей начислено! Действуют ${bonusExpiryDays} дней.`);
+                }
+              }
+            }}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            {isPriceVisible || showPriceByDefault ? (
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">{formatPrice(finalPrice)}</span>
+                  {discountApplied > 0 && (
+                    <span className="text-sm line-through text-muted-foreground">
+                      {formatPrice(price)}
+                    </span>
+                  )}
+                </div>
+                {discountApplied > 0 && (
+                  <div className="text-sm text-green-600">
+                    Экономия {formatPrice(discountApplied)} с бонусов
+                  </div>
+                )}
+              </div>
+            ) : (
+              <span className="text-sm font-medium">
+                {isHovered ? 'Нажмите, чтобы увидеть цену' : 'Цена скрыта'}
+              </span>
+            )}
           </div>
 
-          {/* Bid button – blue like Bids.com */}
-          <Button
-            variant="default"
-            className="
-              mt-4 w-full
-              bg-blue-600 hover:bg-blue-700 text-white
-              text-sm font-bold uppercase tracking-wide
-              py-3 rounded-md
-              transition-all duration-200
-              shadow-sm hover:shadow-md
-            "
-            onClick={(e) => {
-              e.preventDefault();
-              // open bid modal, etc.
-            }}
-          >
-            СДЕЛАТЬ СТАВКУ
-          </Button>
+          {/* Buy or Bid Button */}
+          <div className="mt-4 space-y-2">
+            {(shouldShowBuyButton || showPriceByDefault) && (
+              <Button
+                variant="default"
+                className="
+                  w-full
+                  bg-green-600 hover:bg-green-700 text-white
+                  text-sm font-bold uppercase tracking-wide
+                  py-3 rounded-md
+                  transition-all duration-200
+                  shadow-sm hover:shadow-md
+                "
+                onClick={(e) => {
+                  e.preventDefault();
+                  // Handle buy now action
+                  toast.success('Товар добавлен в корзину!');
+                }}
+              >
+                КУПИТЬ ЗА {formatPrice(finalPrice)}
+              </Button>
+            )}
+            
+            <Button
+              variant="default"
+              className={`
+                w-full
+                ${shouldShowBuyButton || showPriceByDefault ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-600/90 hover:bg-blue-700/90'}
+                text-white text-sm font-bold uppercase tracking-wide
+                py-3 rounded-md
+                transition-all duration-200
+                shadow-sm hover:shadow-md
+              `}
+              onClick={(e) => {
+                e.preventDefault();
+                // Open bid modal
+                if (!isPriceVisible) {
+                  handlePriceClick();
+                  if (bonusRubles > 0) {
+                    toast.success(`+${bonusRubles} бонусных рублей начислено! Действуют ${bonusExpiryDays} дней.`);
+                  }
+                } else {
+                  // Open bid modal
+                  toast('Форма ставки будет открыта в модальном окне');
+                }
+              }}
+            >
+              {isPriceVisible || showPriceByDefault ? 'СДЕЛАТЬ СТАВКУ' : 'УЗНАТЬ ЦЕНУ'}
+            </Button>
+          </div>
         </div>
 
         {/* FOOTER – info block similar to Bids.com */}
@@ -92,6 +188,18 @@ const ProductCard = ({ id, image, title, price, discount, username }: ProductCar
             </div>
           </div>
 
+          {/* Bonus Info */}
+          {bonusRubles > 0 && (
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                Ваши бонусы
+              </span>
+              <span className="text-sm font-semibold text-green-600">
+                +{bonusRubles} ₽
+              </span>
+            </div>
+          )}
+          
           {/* Розничная цена line */}
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
