@@ -28,14 +28,13 @@ const Header = () => {
           {/* Logo left */}
           <Link
             to="/"
-            className="mr-16 flex items-center gap-2 text-lg font-semibold tracking-normal"
+            className="mr-16 flex items-center"
           >
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#C8D9FF] bg-[#C8D9FF]/40 text-xs font-bold">
-              L
-            </span>
-            <span className="uppercase text-sm tracking-wide">
-              OGO
-            </span>
+            <img 
+              src="/logo.jpeg" 
+              alt="Logo" 
+              className="h-14 w-auto object-contain"
+            />
           </Link>
 
           {/* Center nav links */}

@@ -1,161 +1,164 @@
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import { Users, Clock } from "lucide-react";
 
 const ProductDetail = () => {
   const { id } = useParams();
+  const [isRevealed, setIsRevealed] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(3654); // seconds (e.g., 1:00:54)
+  const [participants, setParticipants] = useState(20);
 
-  const thumbnails = Array.from({ length: 4 }, (_, i) => i);
+  // Countdown timer
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (seconds: number) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  };
+
+  const handleLogoClick = () => {
+    if (!isRevealed) {
+      setIsRevealed(true);
+    }
+  };
+
+  const handleBidClick = () => {
+    // Simulate adding a bid
+    setParticipants((prev) => prev + 1);
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
-      <main className="flex-1 container mx-auto px-4 py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* LEFT SIDE – IMAGE GALLERY */}
-          <div className="flex gap-5">
-            {/* Thumbnails */}
-            <div className="flex flex-col gap-3 w-24">
-              {thumbnails.map((thumb) => (
-                <div
-                  key={thumb}
-                  className="
-                    aspect-square rounded-md overflow-hidden
-                    bg-white border border-border/60 shadow-sm
-                    cursor-pointer
-                    transition-all duration-200 hover:shadow-md hover:-translate-y-[1px]
-                  "
+      <main className="flex-1 container mx-auto px-4 py-10 flex items-center justify-center">
+        {/* Main Product Card */}
+        <div className="w-full max-w-lg rounded-xl border border-border/60 bg-white shadow-lg overflow-hidden">
+          <div className="px-8 py-6 relative">
+            {/* Top badges row */}
+            <div className="flex items-center justify-between mb-4">
+              {/* Participants badge */}
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-br from-blue-500 to-green-500 text-white shadow-md">
+                <Users className="w-4 h-4" />
+                <span className="text-sm font-bold">{participants}</span>
+              </div>
+
+              {/* Timer badge */}
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 border border-border/60">
+                <Clock className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm font-semibold text-foreground">{formatTime(timeLeft)}</span>
+              </div>
+            </div>
+
+            {/* Product image */}
+            <div className="flex justify-center py-6">
+              <div className="h-48 w-48 rounded-lg bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center border border-border/40">
+                <img
+                  src="https://via.placeholder.com/192x192?text=Товар"
+                  alt="Товар"
+                  className="max-h-full max-w-full object-contain rounded-lg"
+                />
+              </div>
+            </div>
+
+            {/* Product name */}
+            <h1 className="text-center text-xl font-bold text-foreground mb-3">
+              КОЛЬЦО С ГОЛУБЫМ ТОПАЗОМ 5 КАРАТ 14К ЗОЛОТО
+            </h1>
+
+            {/* Current bid info (before reveal) or price (after reveal) */}
+            <div className="text-center mb-4">
+              {isRevealed ? (
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Текущая ставка</p>
+                  <p className="text-2xl font-bold text-emerald-600">4 600 ₽</p>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Нажмите на кнопку, чтобы увидеть текущую ставку
+                </p>
+              )}
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex gap-3 mb-5">
+              {/* Logo/Buy button */}
+              {!isRevealed ? (
+                <Button
+                  className="flex-1 h-14 bg-blue-700 hover:bg-blue-800 rounded-xl shadow-md text-white flex items-center justify-center transition-all"
+                  onClick={handleLogoClick}
                 >
-                  <div className="w-full h-full bg-gradient-to-br from-slate-50 to-slate-100" />
-                </div>
-              ))}
-            </div>
+                  <img
+                    src="/logo.jpeg"
+                    alt="Logo"
+                    className="h-8 w-auto object-contain"
+                  />
+                </Button>
+              ) : (
+                <Button
+                  className="flex-1 h-14 rounded-xl shadow-md bg-amber-400 hover:bg-amber-500 text-black text-base font-bold transition-all"
+                  onClick={handleBidClick}
+                >
+                  СДЕЛАТЬ СТАВКУ
+                </Button>
+              )}
 
-            {/* Main Image */}
-            <div className="flex-1">
-              <div
-                className="
-                  relative aspect-square rounded-lg overflow-hidden
-                  bg-white border border-border/60
-                  shadow-[0_10px_30px_rgba(15,23,42,0.08)]
-                "
+              {/* Quick bid button */}
+              <Button
+                className="flex-1 h-14 rounded-xl shadow-md bg-emerald-500 hover:bg-emerald-600 text-white text-base font-bold transition-all"
+                onClick={handleBidClick}
               >
-                <div className="w-full h-full bg-gradient-to-br from-slate-50 to-slate-100" />
-
-                {/* Same badge as ProductCard */}
-                <div className="absolute left-4 top-4 flex items-center gap-1.5 bg-white/95 backdrop-blur-sm px-2.5 py-1.5 rounded-md shadow-sm border border-border/50">
-                  <span className="h-3 w-4 rounded-sm bg-gradient-to-r from-blue-500 via-white to-red-500 shadow-sm border border-border/30" />
-                  <span className="text-[10px] font-bold uppercase tracking-wide text-foreground">
-                    ДОСТАВКА ИЗ США
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-6 h-px w-full bg-border/70" />
+                КЛИК +30₽
+              </Button>
             </div>
-          </div>
 
-          {/* RIGHT SIDE – PRODUCT INFORMATION */}
-          <div className="flex flex-col gap-8">
-            {/* Title, Price, Description */}
-            <section>
-              <h1 className="text-2xl font-semibold tracking-tight mb-3">
-                Название товара
-              </h1>
-
-              <div className="text-xl font-bold text-foreground mb-4">
-                2000 ₽
-              </div>
-
-              <p className="text-sm leading-relaxed text-muted-foreground max-w-lg">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                Aliquam placerat, augue a volutpat hendrerit, sapien tortor
-                faucibus augue, a maximus elit ex vitae libero. Sed quis mauris
-                eget arcu facilisis consequat sed eu felis.
-              </p>
-            </section>
-
-            {/* AUCTION BOX – styled like ProductCard footer */}
-            <section
-              className="
-                rounded-lg border border-border/70 bg-slate-50/70
-                px-5 py-4 space-y-3 shadow-sm
-              "
-            >
+            {/* Auction details */}
+            <div className="border-t border-border/60 pt-4 space-y-3 text-sm">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                  ЛИДЕР
-                </span>
+                <span className="font-semibold text-muted-foreground">Лидер:</span>
                 <div className="flex items-center gap-1.5">
                   <span className="h-3.5 w-5 rounded-sm bg-gradient-to-r from-blue-500 via-white to-red-500 shadow-sm border border-border/30" />
-                  <span className="text-xs font-semibold text-foreground">
-                    @ Имя пользователя
-                  </span>
+                  <span className="font-semibold text-foreground">@ ИВАНОВ</span>
                 </div>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                  Розничная цена
-                </span>
-                <span className="font-semibold text-foreground">
-                  2 844 ₽
-                </span>
+                <span className="font-semibold text-muted-foreground">Начальная цена:</span>
+                <span className="font-bold text-foreground">5 000 ₽</span>
               </div>
 
-              <div className="pt-1 text-xs text-muted-foreground">
-                Обновление ставок происходит в реальном времени.
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-muted-foreground">Розничная цена:</span>
+                <span className="font-bold text-foreground">12 844 ₽</span>
               </div>
-            </section>
 
-            {/* ACTION BUTTONS – same blue CTA style as ProductCard */}
-            <section className="flex gap-4">
-              <Button
-                className="
-                  w-44
-                  bg-blue-600 hover:bg-blue-700 text-white
-                  text-sm font-bold uppercase tracking-wide
-                  py-3 rounded-md
-                  shadow-sm hover:shadow-md
-                "
-              >
-                Сделать ставку
-              </Button>
-
-              <Button
-                variant="outline"
-                className="
-                  w-44
-                  text-sm font-medium uppercase tracking-wide
-                  rounded-md
-                "
-              >
-                Предложение
-              </Button>
-            </section>
-
-            {/* SHIPPING / EXTRA INFO */}
-            <section className="text-xs text-muted-foreground">
-              Товар будет отправлен на следующий рабочий день!
-            </section>
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-muted-foreground">Экономия:</span>
+                <span className="font-bold text-emerald-600">-65%</span>
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Divider */}
-        <div className="mt-14 mb-8 h-px w-full bg-border/70" />
-
-        {/* Additional info block */}
-        <div className="max-w-2xl text-sm text-muted-foreground leading-relaxed space-y-3">
-          <p>
-            Все товары проверяются перед отправкой. В случае обнаружения дефектов,
-            вы можете связаться с нашей службой поддержки.
-          </p>
-          <p>
-            Условия доставки и возврата зависят от конкретного продавца и региона.
-            Пожалуйста, ознакомьтесь с правилами до совершения покупки.
-          </p>
+          {/* Bottom info panel */}
+          <div className="bg-slate-50/50 border-t border-border/60 px-8 py-4">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
+              <span className="h-3 w-4 rounded-sm bg-gradient-to-r from-blue-500 via-white to-red-500 shadow-sm border border-border/30" />
+              <span className="font-semibold">ДОСТАВКА ИЗ США</span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Товар будет отправлен на следующий рабочий день после завершения аукциона!
+            </p>
+          </div>
         </div>
       </main>
 
