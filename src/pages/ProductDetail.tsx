@@ -87,12 +87,12 @@ const ProductDetail = () => {
                 <div className="w-full h-full bg-gradient-to-br from-slate-50 to-slate-100" />
 
                 {/* Same badge as ProductCard */}
-                <div className="absolute left-4 top-4 flex items-center gap-1.5 bg-white/95 backdrop-blur-sm px-2.5 py-1.5 rounded-md shadow-sm border border-border/50">
+                {/* <div className="absolute left-4 top-4 flex items-center gap-1.5 bg-white/95 backdrop-blur-sm px-2.5 py-1.5 rounded-md shadow-sm border border-border/50">
                   <span className="h-3 w-4 rounded-sm bg-gradient-to-r from-blue-500 via-white to-red-500 shadow-sm border border-border/30" />
                   <span className="text-[10px] font-bold uppercase tracking-wide text-foreground">
                     ДОСТАВКА ИЗ США
                   </span>
-                </div>
+                </div> */}
               </div>
 
               <div className="mt-6 h-px w-full bg-border/70" />
