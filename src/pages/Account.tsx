@@ -16,7 +16,7 @@ const mockOrders = [
 const Account = () => {
   const navigate = useNavigate();
   const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("orders");
+  const [activeTab, setActiveTab] = useState("balance");
 
   useEffect(() => {
     // Check if user is authenticated
@@ -62,11 +62,147 @@ const Account = () => {
             
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="mb-8 bg-slate-50/50">
-                <TabsTrigger value="orders">Заказы</TabsTrigger>
-                <TabsTrigger value="address">Адрес</TabsTrigger>
-                <TabsTrigger value="data">Мои данные</TabsTrigger>
+                <TabsTrigger value="balance">Пополнение счета</TabsTrigger>
+                <TabsTrigger value="bonus">Бонусный счет</TabsTrigger>
+                <TabsTrigger value="orders">Мои заказы</TabsTrigger>
+                <TabsTrigger value="data">Информация</TabsTrigger>
               </TabsList>
               
+              <TabsContent value="balance" className="space-y-6">
+                <div className="rounded-lg border border-border/60 bg-white shadow-sm p-8">
+                  <h2 className="text-2xl font-bold mb-6">Пополнение счета</h2>
+                  
+                  {/* Текущий баланс */}
+                  <div className="rounded-lg bg-gradient-to-br from-blue-50 to-green-50 border border-border/60 p-6 mb-6">
+                    <p className="text-sm text-muted-foreground mb-2">Текущий баланс</p>
+                    <p className="text-3xl font-bold text-foreground">0 ₽</p>
+                  </div>
+
+                  {/* Быстрое пополнение */}
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold mb-4">Быстрое пополнение</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      {[500, 1000, 2000, 5000].map((amount) => (
+                        <Button
+                          key={amount}
+                          variant="outline"
+                          className="h-16 border-border/60 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 font-bold"
+                        >
+                          {amount} ₽
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Произвольная сумма */}
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold mb-4">Произвольная сумма</h3>
+                    <div className="flex gap-3">
+                      <input
+                        type="number"
+                        placeholder="Введите сумму"
+                        className="flex-1 h-12 px-4 rounded-lg border border-border/60 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                      <Button className="h-12 px-8 bg-emerald-500 hover:bg-emerald-600 text-white font-bold">
+                        Пополнить
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Способы оплаты */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Способы оплаты</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="rounded-lg border border-border/60 p-4 hover:bg-slate-50 cursor-pointer transition-colors">
+                        <div className="text-center">
+                          <div className="text-2xl mb-2">💳</div>
+                          <p className="text-sm font-semibold">Банковская карта</p>
+                        </div>
+                      </div>
+                      <div className="rounded-lg border border-border/60 p-4 hover:bg-slate-50 cursor-pointer transition-colors">
+                        <div className="text-center">
+                          <div className="text-2xl mb-2">📱</div>
+                          <p className="text-sm font-semibold">СБП</p>
+                        </div>
+                      </div>
+                      <div className="rounded-lg border border-border/60 p-4 hover:bg-slate-50 cursor-pointer transition-colors">
+                        <div className="text-center">
+                          <div className="text-2xl mb-2">💰</div>
+                          <p className="text-sm font-semibold">Электронные кошельки</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="bonus" className="space-y-6">
+                <div className="rounded-lg border border-border/60 bg-white shadow-sm p-8">
+                  <h2 className="text-2xl font-bold mb-6">Бонусный счет</h2>
+                  
+                  {/* Бонусный баланс */}
+                  <div className="rounded-lg bg-gradient-to-br from-amber-50 to-orange-50 border border-border/60 p-6 mb-6">
+                    <p className="text-sm text-muted-foreground mb-2">Накоплено бонусов</p>
+                    <p className="text-3xl font-bold text-foreground">0 ₽</p>
+                  </div>
+
+                  {/* Как получить бонусы */}
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold mb-4">Как получить бонусы</h3>
+                    <div className="space-y-3">
+                      <div className="rounded-lg border border-border/60 bg-slate-50/50 p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-xl">
+                            🎁
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-semibold text-sm">За каждую покупку</p>
+                            <p className="text-xs text-muted-foreground">Получайте 5% от суммы покупки</p>
+                          </div>
+                          <div className="text-emerald-600 font-bold">+5%</div>
+                        </div>
+                      </div>
+                      
+                      <div className="rounded-lg border border-border/60 bg-slate-50/50 p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-xl">
+                            👥
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-semibold text-sm">За приглашение друга</p>
+                            <p className="text-xs text-muted-foreground">Пригласите друга и получите бонусы</p>
+                          </div>
+                          <div className="text-blue-600 font-bold">+500₽</div>
+                        </div>
+                      </div>
+                      
+                      <div className="rounded-lg border border-border/60 bg-slate-50/50 p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-xl">
+                            ⭐
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-semibold text-sm">За отзывы</p>
+                            <p className="text-xs text-muted-foreground">Оставляйте отзывы и зарабатывайте</p>
+                          </div>
+                          <div className="text-amber-600 font-bold">+100₽</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* История бонусов */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">История бонусов</h3>
+                    <div className="rounded-lg border border-border/60 bg-slate-50/50 p-8 text-center">
+                      <p className="text-sm text-muted-foreground">
+                        У вас пока нет истории начисления бонусов
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
               <TabsContent value="orders" className="space-y-4">
                 {mockOrders.map((order, index) => (
                   <div 
@@ -105,14 +241,6 @@ const Account = () => {
                 ))}
               </TabsContent>
               
-              <TabsContent value="address">
-                <div className="rounded-lg border border-border/60 bg-slate-50/50 p-6">
-                  <p className="text-sm text-muted-foreground">
-                    Адресная информация будет отображаться здесь.
-                  </p>
-                </div>
-              </TabsContent>
-              
               <TabsContent value="data">
                 <Card className="border-border/60 bg-slate-50/50">
                   <CardHeader>
@@ -139,13 +267,38 @@ const Account = () => {
                     </div>
                     
                     <div className="pt-4 border-t border-border/60">
-                      <Button 
-                        variant="outline" 
-                        className="border-blue-600 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
-                        onClick={() => setActiveTab('address')}
-                      >
-                        Редактировать адрес
-                      </Button>
+                      <h3 className="text-lg font-semibold mb-4">Адрес доставки</h3>
+                      <div className="space-y-4">
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground mb-1">Город</p>
+                          <input
+                            type="text"
+                            placeholder="Введите город"
+                            className="w-full h-10 px-3 rounded-lg border border-border/60 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground mb-1">Адрес</p>
+                          <input
+                            type="text"
+                            placeholder="Улица, дом, квартира"
+                            className="w-full h-10 px-3 rounded-lg border border-border/60 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground mb-1">Индекс</p>
+                          <input
+                            type="text"
+                            placeholder="Почтовый индекс"
+                            className="w-full h-10 px-3 rounded-lg border border-border/60 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                        <Button 
+                          className="bg-blue-600 hover:bg-blue-700 text-white"
+                        >
+                          Сохранить адрес
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

@@ -7,10 +7,12 @@ import Pagination from "@/components/Pagination";
 
 const mockProducts = Array.from({ length: 6 }, (_, i) => ({
   id: i + 1,
-  title: "Товар",
-  price: "01:17:55",
-  discount: "2844 ₽",
-  username: "Имя пользователя",
+  title: `КОЛЬЦО С ДРАГОЦЕННЫМ КАМНЕМ ${i + 1} КАРАТ 14К ЗОЛОТО`,
+  price: "4 600 ₽",
+  discount: `${2844 + i * 500} ₽`,
+  username: ["ИВАНОВ", "ПЕТРОВ", "СИДОРОВ", "КОЗЛОВ", "ОРЛОВ", "ВОЛКОВ"][i],
+  participants: 20 + i * 3,
+  timeLeft: 3600 + i * 1200, // Different times for each card
 }));
 
 const Catalog = () => {
