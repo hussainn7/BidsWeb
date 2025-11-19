@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 
 const ProductDetail = () => {
   const { id } = useParams();
-  const [isRevealed, setIsRevealed] = useState(false);
+  const [isRevealed, setIsRevealed] = useState(() => {
+    return localStorage.getItem(`product-${id}-revealed`) === 'true';
+  });
   const [clickCount, setClickCount] = useState(0);
   const [currentPrice, setCurrentPrice] = useState(2000);
   const [timeLeft, setTimeLeft] = useState(3654);
@@ -27,10 +29,21 @@ const ProductDetail = () => {
   const handleLogoClick = () => {
     if (!isRevealed) {
       setIsRevealed(true);
+      if (id) {
+        localStorage.setItem(`product-${id}-revealed`, 'true');
+      }
     }
   };
 
   const handleClick30 = () => {
+    // Открываем цену автоматически при первом клике
+    if (!isRevealed) {
+      setIsRevealed(true);
+      if (id) {
+        localStorage.setItem(`product-${id}-revealed`, 'true');
+      }
+    }
+    
     const newClickCount = clickCount + 1;
     setClickCount(newClickCount);
     
@@ -148,27 +161,27 @@ const ProductDetail = () => {
               </div>
 
               <div className="pt-1 text-xs text-muted-foreground">
-                Обновление ставок происходит в реальном времени.
+                Обновление цены в реальном времени ⌛️
               </div>
             </section>
 
              {/* ACTION BUTTONS */}
-             <section className="flex gap-4">
+             <section className="flex flex-col sm:flex-row gap-4">
                {/* Logo/Buy button */}
                {!isRevealed ? (
                  <Button
-                   className="w-44 h-14 bg-blue-700 hover:bg-blue-800 text-white flex items-center justify-center rounded-md shadow-md"
+                   className="w-full sm:w-44 h-14 bg-blue-700 hover:bg-blue-800 text-white flex items-center justify-center rounded-md shadow-md"
                    onClick={handleLogoClick}
                  >
                    <img
-                     src="/logo.jpeg"
+                     src="/logo.png"
                      alt="Logo"
-                     className="h-8 w-auto object-contain"
+                     className="h-12 w-auto object-contain"
                    />
                  </Button>
                ) : (
                  <Button
-                   className="w-44 h-14 bg-amber-400 hover:bg-amber-500 text-black text-sm font-bold uppercase rounded-md shadow-md"
+                   className="w-full sm:w-44 h-14 bg-amber-400 hover:bg-amber-500 text-black text-sm font-bold uppercase rounded-md shadow-md"
                  >
                    КУПИТЬ
                  </Button>
@@ -176,7 +189,7 @@ const ProductDetail = () => {
 
                {/* Click 30 button */}
                <Button
-                 className="w-44 h-14 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold uppercase rounded-md shadow-md"
+                 className="w-full sm:w-44 h-14 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold uppercase rounded-md shadow-md"
                  onClick={handleClick30}
                >
                  КЛИК 30₽

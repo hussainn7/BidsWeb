@@ -23,22 +23,22 @@ const Header = () => {
 
   return (
     <header className="relative z-50 border-b border-border bg-background/80 backdrop-blur-md">
-      <div className="container mx-auto px-4 relative">
-        <div className="flex items-center h-16 border-b border-border/70">
+      <div className="container mx-auto px-2 sm:px-4 relative">
+        <div className="flex items-center h-14 sm:h-16 border-b border-border/70">
           {/* Logo left */}
           <Link
             to="/"
-            className="mr-16 flex items-center"
+            className="mr-4 sm:mr-8 md:mr-16 flex items-center flex-shrink-0"
           >
             <img 
-              src="/logo.jpeg" 
+              src="/logo.png" 
               alt="Logo" 
-              className="h-14 w-auto object-contain"
+              className="h-10 sm:h-12 md:h-14 w-auto object-contain"
             />
           </Link>
 
           {/* Center nav links */}
-          <nav className="hidden md:flex flex-1 items-center justify-end gap-8 text-sm">
+          <nav className="hidden md:flex flex-1 items-center justify-end gap-4 lg:gap-8 text-sm">
             {navLinks.map((link) => {
               const active = isActive(link.path);
               const isCatalog = link.path === "/";
@@ -103,22 +103,22 @@ const Header = () => {
           </nav>
 
           {/* Icons right – same position, nicer styling */}
-          <div className="flex items-center justify-end gap-3 text-muted-foreground ml-8">
+          <div className="flex items-center justify-end gap-1 sm:gap-2 md:gap-3 text-muted-foreground ml-auto md:ml-8">
             <span className="hidden md:inline-block h-5 border-l border-border mr-1.5" />
-            <button className="rounded-full p-1.5 hover:bg-[#C8D9FF]/40 hover:text-slate-900 transition-colors">
-              <Search className="w-5 h-5" />
+            <button className="rounded-full p-1 sm:p-1.5 hover:bg-[#C8D9FF]/40 hover:text-slate-900 transition-colors">
+              <Search className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
             <Link
               to="/cart"
-              className="rounded-full p-1.5 hover:bg-[#C8D9FF]/40 hover:text-slate-900 transition-colors"
+              className="rounded-full p-1 sm:p-1.5 hover:bg-[#C8D9FF]/40 hover:text-slate-900 transition-colors"
             >
-              <ShoppingCart className="w-5 h-5" />
+              <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>
             <Link
               to="/login"
-              className="rounded-full p-1.5 hover:bg-[#C8D9FF]/40 hover:text-slate-900 transition-colors"
+              className="rounded-full p-1 sm:p-1.5 hover:bg-[#C8D9FF]/40 hover:text-slate-900 transition-colors"
             >
-              <User className="w-5 h-5" />
+              <User className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>
           </div>
         </div>

@@ -24,7 +24,9 @@ const ProductCard = ({
   participants = 20,
   timeLeft = 3654
 }: ProductCardProps) => {
-  const [isRevealed, setIsRevealed] = useState(false);
+  const [isRevealed, setIsRevealed] = useState(() => {
+    return localStorage.getItem(`product-${id}-revealed`) === 'true';
+  });
   const [clickCount, setClickCount] = useState(0);
   const [currentPrice, setCurrentPrice] = useState(parseInt(price.replace(/[^\d]/g, "")));
   const [localParticipants, setLocalParticipants] = useState(participants);
@@ -52,11 +54,19 @@ const ProductCard = ({
     e.preventDefault();
     if (!isRevealed) {
       setIsRevealed(true);
+      localStorage.setItem(`product-${id}-revealed`, 'true');
     }
   };
 
   const handleClick30 = (e: React.MouseEvent) => {
     e.preventDefault();
+    
+    // Открываем цену автоматически при первом клике
+    if (!isRevealed) {
+      setIsRevealed(true);
+      localStorage.setItem(`product-${id}-revealed`, 'true');
+    }
+    
     const newClickCount = clickCount + 1;
     setClickCount(newClickCount);
     setLocalParticipants((prev) => prev + 1);
@@ -140,9 +150,9 @@ const ProductCard = ({
                 onClick={handleLogoClick}
               >
                 <img
-                  src="/logo.jpeg"
+                  src="/logo.png"
                   alt="Logo"
-                  className="h-6 w-auto object-contain"
+                  className="h-12 w-auto object-contain"
                 />
               </Button>
             ) : (
@@ -173,10 +183,10 @@ const ProductCard = ({
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
+            {/* <div className="flex items-center justify-between">
               <span className="font-semibold text-muted-foreground">Розничная цена:</span>
               <span className="font-bold text-foreground">{discount || "2 844 ₽"}</span>
-            </div>
+            </div> */}
           </div>
         </div>
 

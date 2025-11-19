@@ -46,14 +46,14 @@ const Account = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-2 sm:px-4 py-4 sm:py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="rounded-lg border border-border/60 bg-white shadow-sm p-8">
-            <div className="flex justify-between items-center mb-8">
-              <h1 className="text-3xl font-bold">МОЙ АККАУНТ</h1>
+          <div className="rounded-lg border border-border/60 bg-white shadow-sm p-4 sm:p-6 md:p-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+              <h1 className="text-2xl sm:text-3xl font-bold">МОЙ АККАУНТ</h1>
               <Button 
                 variant="outline" 
-                className="border-border/60 hover:bg-destructive/10 hover:text-destructive"
+                className="border-border/60 hover:bg-destructive/10 hover:text-destructive w-full sm:w-auto text-sm"
                 onClick={handleLogout}
               >
                 Выйти
@@ -61,16 +61,29 @@ const Account = () => {
             </div>
             
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="mb-8 bg-slate-50/50">
-                <TabsTrigger value="balance">Пополнение счета</TabsTrigger>
-                <TabsTrigger value="bonus">Бонусный счет</TabsTrigger>
-                <TabsTrigger value="orders">Мои заказы</TabsTrigger>
-                <TabsTrigger value="data">Информация</TabsTrigger>
-              </TabsList>
+              <div className="mb-8 overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+                <TabsList className="bg-slate-50/50 w-full sm:w-auto inline-flex min-w-full sm:min-w-0">
+                  <TabsTrigger value="balance" className="flex-1 sm:flex-none text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4">
+                    <span className="hidden sm:inline">Пополнение счета</span>
+                    <span className="sm:hidden">Пополнение</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="bonus" className="flex-1 sm:flex-none text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4">
+                    <span className="hidden sm:inline">Бонусный счет</span>
+                    <span className="sm:hidden">Бонусы</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="orders" className="flex-1 sm:flex-none text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4">
+                    Заказы
+                  </TabsTrigger>
+                  <TabsTrigger value="data" className="flex-1 sm:flex-none text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4">
+                    <span className="hidden sm:inline">Информация</span>
+                    <span className="sm:hidden">Инфо</span>
+                  </TabsTrigger>
+                </TabsList>
+              </div>
               
-              <TabsContent value="balance" className="space-y-6">
-                <div className="rounded-lg border border-border/60 bg-white shadow-sm p-8">
-                  <h2 className="text-2xl font-bold mb-6">Пополнение счета</h2>
+              <TabsContent value="balance" className="space-y-4 sm:space-y-6">
+                <div className="rounded-lg border border-border/60 bg-white shadow-sm p-4 sm:p-6 md:p-8">
+                  <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Пополнение счета</h2>
                   
                   {/* Текущий баланс */}
                   <div className="rounded-lg bg-gradient-to-br from-blue-50 to-green-50 border border-border/60 p-6 mb-6">
@@ -86,7 +99,7 @@ const Account = () => {
                         <Button
                           key={amount}
                           variant="outline"
-                          className="h-16 border-border/60 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 font-bold"
+                          className="h-14 sm:h-16 text-sm sm:text-base border-border/60 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 font-bold"
                         >
                           {amount} ₽
                         </Button>
@@ -97,13 +110,13 @@ const Account = () => {
                   {/* Произвольная сумма */}
                   <div className="mb-6">
                     <h3 className="text-lg font-semibold mb-4">Произвольная сумма</h3>
-                    <div className="flex gap-3">
+                    <div className="flex flex-col sm:flex-row gap-3">
                       <input
                         type="number"
                         placeholder="Введите сумму"
                         className="flex-1 h-12 px-4 rounded-lg border border-border/60 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                       />
-                      <Button className="h-12 px-8 bg-emerald-500 hover:bg-emerald-600 text-white font-bold">
+                      <Button className="h-12 px-8 bg-emerald-500 hover:bg-emerald-600 text-white font-bold whitespace-nowrap">
                         Пополнить
                       </Button>
                     </div>
@@ -136,9 +149,9 @@ const Account = () => {
                 </div>
               </TabsContent>
 
-              <TabsContent value="bonus" className="space-y-6">
-                <div className="rounded-lg border border-border/60 bg-white shadow-sm p-8">
-                  <h2 className="text-2xl font-bold mb-6">Бонусный счет</h2>
+              <TabsContent value="bonus" className="space-y-4 sm:space-y-6">
+                <div className="rounded-lg border border-border/60 bg-white shadow-sm p-4 sm:p-6 md:p-8">
+                  <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Бонусный счет</h2>
                   
                   {/* Бонусный баланс */}
                   <div className="rounded-lg bg-gradient-to-br from-amber-50 to-orange-50 border border-border/60 p-6 mb-6">
@@ -149,44 +162,18 @@ const Account = () => {
                   {/* Как получить бонусы */}
                   <div className="mb-6">
                     <h3 className="text-lg font-semibold mb-4">Как получить бонусы</h3>
-                    <div className="space-y-3">
-                      <div className="rounded-lg border border-border/60 bg-slate-50/50 p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-xl">
-                            🎁
-                          </div>
-                          <div className="flex-1">
-                            <p className="font-semibold text-sm">За каждую покупку</p>
-                            <p className="text-xs text-muted-foreground">Получайте 5% от суммы покупки</p>
-                          </div>
-                          <div className="text-emerald-600 font-bold">+5%</div>
+                    <div className="rounded-lg border border-border/60 bg-slate-50/50 p-6">
+                      <div className="flex flex-col sm:flex-row items-center gap-4">
+                        <div className="flex-shrink-0 w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center text-3xl">
+                          🖱️
                         </div>
-                      </div>
-                      
-                      <div className="rounded-lg border border-border/60 bg-slate-50/50 p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-xl">
-                            👥
-                          </div>
-                          <div className="flex-1">
-                            <p className="font-semibold text-sm">За приглашение друга</p>
-                            <p className="text-xs text-muted-foreground">Пригласите друга и получите бонусы</p>
-                          </div>
-                          <div className="text-blue-600 font-bold">+500₽</div>
+                        <div className="flex-1 text-center sm:text-left">
+                          <p className="font-bold text-lg mb-2">За клики на товары</p>
+                          <p className="text-sm text-muted-foreground">
+                            Нажимайте "КЛИК 30₽" на карточках товаров и зарабатывайте бонусы
+                          </p>
                         </div>
-                      </div>
-                      
-                      <div className="rounded-lg border border-border/60 bg-slate-50/50 p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-xl">
-                            ⭐
-                          </div>
-                          <div className="flex-1">
-                            <p className="font-semibold text-sm">За отзывы</p>
-                            <p className="text-xs text-muted-foreground">Оставляйте отзывы и зарабатывайте</p>
-                          </div>
-                          <div className="text-amber-600 font-bold">+100₽</div>
-                        </div>
+                        <div className="text-emerald-600 font-bold text-2xl">+30₽</div>
                       </div>
                     </div>
                   </div>
