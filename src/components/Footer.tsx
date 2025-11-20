@@ -12,9 +12,6 @@ const Footer = () => {
           >
             О нас
           </Link>
-          {/* <Link to="/bet-placement" className="text-muted-foreground hover:text-foreground transition-colors">
-            Размещение ставок
-          </Link> */}
           <Link
             to="/faq"
             className="text-muted-foreground hover:text-foreground transition-colors"
@@ -33,9 +30,6 @@ const Footer = () => {
           >
             Доставка и оплата
           </Link>
-          {/* <Link to="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
-            Правила возврата
-          </Link> */}
           <Link
             to="/terms"
             className="text-muted-foreground hover:text-foreground transition-colors"
@@ -43,11 +37,6 @@ const Footer = () => {
             Договор оферты
           </Link>
         </div>
-
-        {/* Second line: privacy policy */}
-        {/* <div className="text-sm text-muted-foreground mb-8">
-          Политика конфиденциальности
-        </div> */}
 
         {/* Payment icons centered */}
         <div className="flex justify-center gap-6 mt-8">
@@ -61,6 +50,16 @@ const Footer = () => {
             alt="Mastercard"
             className="h-8"
           />
+        </div>
+
+        {/* Platform name + tagline */}
+        <div className="mt-8 text-center text-sm text-muted-foreground">
+          <div className="font-semibold text-foreground text-base">
+            Ниже Некуда
+          </div>
+          <div className="text-muted-foreground">
+            Первая гемифицированная платформа низких цен
+          </div>
         </div>
       </div>
     </footer>
