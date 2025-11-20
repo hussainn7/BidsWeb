@@ -188,7 +188,6 @@ const ProductCard = ({
                 Лидер по кликам:
               </span>
               <div className="flex items-center gap-1">
-                <span className="h-3 w-4 rounded-sm bg-gradient-to-r from-blue-500 via-white to-red-500 shadow-sm border border-border/30" />
                 <span className="font-semibold text-foreground text-xs">
                   @ {username || "USER"}
                 </span>
