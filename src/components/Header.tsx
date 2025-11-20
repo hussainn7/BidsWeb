@@ -9,6 +9,7 @@ const Header = () => {
 
   const navLinks = [
     { path: "/", label: "Каталог" },
+    { path: "/akszie", label: "Акции" },
     { path: "/about", label: "О нас" },
     { path: "/shipping", label: "Доставка/Оплата" },
     { path: "/contacts", label: "Контакты" },
@@ -30,9 +31,9 @@ const Header = () => {
             to="/"
             className="mr-4 sm:mr-8 md:mr-16 flex items-center flex-shrink-0"
           >
-            <img 
-              src="/logo.png" 
-              alt="Logo" 
+            <img
+              src="/logo.png"
+              alt="Logo"
               className="h-10 sm:h-12 md:h-14 w-auto object-contain"
             />
           </Link>
@@ -45,8 +46,7 @@ const Header = () => {
 
               const baseClasses =
                 "relative pb-1 text-sm font-medium tracking-normal transition-colors";
-              const activeClasses =
-                "text-slate-900";
+              const activeClasses = "text-slate-900";
               const inactiveClasses =
                 "text-muted-foreground hover:text-slate-900";
 

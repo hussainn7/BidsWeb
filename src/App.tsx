@@ -17,6 +17,7 @@ import Register from "./pages/Register";
 import Account from "./pages/Account";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import Akszie from "./pages/Akszie";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ const App = () => (
           <Route path="/register" element={<Register />} />
           <Route path="/account" element={<Account />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/akszie" element={<Akszie />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
