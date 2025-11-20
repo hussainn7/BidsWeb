@@ -7,28 +7,30 @@ interface ProductCardProps {
   id: number;
   image?: string;
   title: string;
-  price: string;      // Time or price string
-  discount?: string;  // retail price
-  username?: string;  // highest bidder
+  price: string; // Time or price string
+  discount?: string; // retail price
+  username?: string; // highest bidder
   participants?: number; // Number of participants
   timeLeft?: number; // Time left in seconds
 }
 
-const ProductCard = ({ 
-  id, 
-  image, 
-  title, 
-  price, 
-  discount, 
+const ProductCard = ({
+  id,
+  image,
+  title,
+  price,
+  discount,
   username,
   participants = 20,
-  timeLeft = 3654
+  timeLeft = 3654,
 }: ProductCardProps) => {
   const [isRevealed, setIsRevealed] = useState(() => {
-    return localStorage.getItem(`product-${id}-revealed`) === 'true';
+    return localStorage.getItem(`product-${id}-revealed`) === "true";
   });
   const [clickCount, setClickCount] = useState(0);
-  const [currentPrice, setCurrentPrice] = useState(parseInt(price.replace(/[^\d]/g, "")));
+  const [currentPrice, setCurrentPrice] = useState(
+    parseInt(price.replace(/[^\d]/g, ""))
+  );
   const [localParticipants, setLocalParticipants] = useState(participants);
   const [currentTime, setCurrentTime] = useState(timeLeft);
   const [isPermanent, setIsPermanent] = useState(false);
@@ -36,7 +38,7 @@ const ProductCard = ({
   // Countdown timer
   useEffect(() => {
     if (isPermanent) return;
-    
+
     const timer = setInterval(() => {
       setCurrentTime((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
@@ -47,33 +49,35 @@ const ProductCard = ({
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = seconds % 60;
-    return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+    return `${h.toString().padStart(2, "0")}:${m
+      .toString()
+      .padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
     if (!isRevealed) {
       setIsRevealed(true);
-      localStorage.setItem(`product-${id}-revealed`, 'true');
+      localStorage.setItem(`product-${id}-revealed`, "true");
     }
   };
 
   const handleClick30 = (e: React.MouseEvent) => {
     e.preventDefault();
-    
+
     // Открываем цену автоматически при первом клике
     if (!isRevealed) {
       setIsRevealed(true);
-      localStorage.setItem(`product-${id}-revealed`, 'true');
+      localStorage.setItem(`product-${id}-revealed`, "true");
     }
-    
+
     const newClickCount = clickCount + 1;
     setClickCount(newClickCount);
     setLocalParticipants((prev) => prev + 1);
-    
+
     // Уменьшаем цену на 30 рублей
     setCurrentPrice((prev) => Math.max(prev - 30, 0));
-    
+
     // Добавляем время в зависимости от количества кликов
     if (newClickCount === 1) {
       // +1 час
@@ -132,29 +136,33 @@ const ProductCard = ({
             {isRevealed && clickCount > 0 ? (
               <div className="space-y-0.5">
                 <p className="text-xs text-muted-foreground">Цена товара</p>
-                <p className="text-lg font-bold text-emerald-600">{currentPrice.toLocaleString()} ₽</p>
+                <p className="text-lg font-bold text-emerald-600">
+                  {currentPrice.toLocaleString()} ₽
+                </p>
               </div>
             ) : (
               <p className="text-xs text-muted-foreground px-2">
-                {!isRevealed ? "Нажмите на логотип" : "Нажмите КЛИК 30₽"}
+                {!isRevealed ? "Нажмите на клик" : "Нажмите КЛИК 30₽"}
               </p>
             )}
           </div>
 
           {/* Action buttons */}
           <div className="flex gap-2 mb-4">
-            {/* Logo/Buy button */}
+            {/* Logo/Buy visual element */}
             {!isRevealed ? (
-              <Button
-                className="flex-1 h-12 bg-blue-700 hover:bg-blue-800 rounded-xl shadow-md text-white flex items-center justify-center transition-all"
-                onClick={handleLogoClick}
+              <div
+                className="flex-1 h-12 bg-blue-700 rounded-xl shadow-md text-white flex items-center justify-center"
+                // ^ 1. Changed <Button> to <div>
+                //   2. Removed onClick prop
+                //   3. Removed 'hover:bg-blue-800' and 'transition-all' from className
               >
                 <img
                   src="/logo.png"
                   alt="Logo"
                   className="h-12 w-auto object-contain"
                 />
-              </Button>
+              </div>
             ) : (
               <Button
                 className="flex-1 h-12 rounded-xl shadow-md bg-amber-400 hover:bg-amber-500 text-black text-xs font-bold transition-all"
@@ -176,10 +184,14 @@ const ProductCard = ({
           {/* Auction details */}
           <div className="border-t border-border/60 pt-3 space-y-2 text-xs mt-auto">
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-muted-foreground">Лидер:</span>
+              <span className="font-semibold text-muted-foreground">
+                Лидер по кликам:
+              </span>
               <div className="flex items-center gap-1">
                 <span className="h-3 w-4 rounded-sm bg-gradient-to-r from-blue-500 via-white to-red-500 shadow-sm border border-border/30" />
-                <span className="font-semibold text-foreground text-xs">@ {username || "USER"}</span>
+                <span className="font-semibold text-foreground text-xs">
+                  @ {username || "USER"}
+                </span>
               </div>
             </div>
 
@@ -189,7 +201,6 @@ const ProductCard = ({
             </div> */}
           </div>
         </div>
-
       </article>
     </Link>
   );

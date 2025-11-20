@@ -6,25 +6,40 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Top links row */}
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm mb-2 text-muted-foreground">
-          <Link to="/about" className="text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            to="/about"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
             О нас
           </Link>
-          <Link to="/bet-placement" className="text-muted-foreground hover:text-foreground transition-colors">
+          {/* <Link to="/bet-placement" className="text-muted-foreground hover:text-foreground transition-colors">
             Размещение ставок
-          </Link>
-          <Link to="/faq" className="text-muted-foreground hover:text-foreground transition-colors">
+          </Link> */}
+          <Link
+            to="/faq"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
             Связаться с нами
           </Link>
-          <Link to="/faq" className="text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            to="/faq"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
             Вопросы и ответы
           </Link>
-          <Link to="/shipping" className="text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            to="/shipping"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
             Доставка и оплата
           </Link>
           {/* <Link to="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
             Правила возврата
           </Link> */}
-          <Link to="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            to="/terms"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
             Договор оферты
           </Link>
         </div>

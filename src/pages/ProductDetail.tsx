@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 const ProductDetail = () => {
   const { id } = useParams();
   const [isRevealed, setIsRevealed] = useState(() => {
-    return localStorage.getItem(`product-${id}-revealed`) === 'true';
+    return localStorage.getItem(`product-${id}-revealed`) === "true";
   });
   const [clickCount, setClickCount] = useState(0);
   const [currentPrice, setCurrentPrice] = useState(2000);
@@ -19,7 +19,7 @@ const ProductDetail = () => {
   // Countdown timer
   useEffect(() => {
     if (isPermanent) return;
-    
+
     const timer = setInterval(() => {
       setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
@@ -27,12 +27,12 @@ const ProductDetail = () => {
   }, [isPermanent]);
 
   const handleLogoClick = () => {
-    if (!isRevealed) {
-      setIsRevealed(true);
-      if (id) {
-        localStorage.setItem(`product-${id}-revealed`, 'true');
-      }
-    }
+    // if (!isRevealed) {
+    //   setIsRevealed(true);
+    //   if (id) {
+    //     localStorage.setItem(`product-${id}-revealed`, "true");
+    //   }
+    // }
   };
 
   const handleClick30 = () => {
@@ -40,16 +40,16 @@ const ProductDetail = () => {
     if (!isRevealed) {
       setIsRevealed(true);
       if (id) {
-        localStorage.setItem(`product-${id}-revealed`, 'true');
+        localStorage.setItem(`product-${id}-revealed`, "true");
       }
     }
-    
+
     const newClickCount = clickCount + 1;
     setClickCount(newClickCount);
-    
+
     // Уменьшаем цену на 30 рублей
     setCurrentPrice((prev) => Math.max(prev - 30, 0));
-    
+
     // Добавляем время в зависимости от количества кликов
     if (newClickCount === 1) {
       // +1 час
@@ -114,23 +114,25 @@ const ProductDetail = () => {
 
           {/* RIGHT SIDE – PRODUCT INFORMATION */}
           <div className="flex flex-col gap-8">
-             {/* Title, Price, Description */}
-             <section>
-               <h1 className="text-2xl font-semibold tracking-tight mb-3">
-                 Название товара
-               </h1>
+            {/* Title, Price, Description */}
+            <section>
+              <h1 className="text-2xl font-semibold tracking-tight mb-3">
+                Название товара
+              </h1>
 
-               <div className="text-xl font-bold text-foreground mb-4">
-                 {isRevealed ? `${currentPrice.toLocaleString()} ₽` : "Нажмите на логотип"}
-               </div>
+              <div className="text-xl font-bold text-foreground mb-4">
+                {isRevealed
+                  ? `${currentPrice.toLocaleString()} ₽`
+                  : "Нажмите на клик"}
+              </div>
 
-               <p className="text-sm leading-relaxed text-muted-foreground max-w-lg">
-                 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                 Aliquam placerat, augue a volutpat hendrerit, sapien tortor
-                 faucibus augue, a maximus elit ex vitae libero. Sed quis mauris
-                 eget arcu facilisis consequat sed eu felis.
-               </p>
-             </section>
+              <p className="text-sm leading-relaxed text-muted-foreground max-w-lg">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam
+                placerat, augue a volutpat hendrerit, sapien tortor faucibus
+                augue, a maximus elit ex vitae libero. Sed quis mauris eget arcu
+                facilisis consequat sed eu felis.
+              </p>
+            </section>
 
             {/* AUCTION BOX – styled like ProductCard footer */}
             <section
@@ -141,10 +143,9 @@ const ProductDetail = () => {
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                  ЛИДЕР
+                  Лидер по кликам
                 </span>
                 <div className="flex items-center gap-1.5">
-                  <span className="h-3.5 w-5 rounded-sm bg-gradient-to-r from-blue-500 via-white to-red-500 shadow-sm border border-border/30" />
                   <span className="text-xs font-semibold text-foreground">
                     @ Имя пользователя
                   </span>
@@ -153,11 +154,9 @@ const ProductDetail = () => {
 
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                  Розничная цена
+                  Стартовая цена
                 </span>
-                <span className="font-semibold text-foreground">
-                  2 844 ₽
-                </span>
+                <span className="font-semibold text-foreground">2 844 ₽</span>
               </div>
 
               <div className="pt-1 text-xs text-muted-foreground">
@@ -165,36 +164,34 @@ const ProductDetail = () => {
               </div>
             </section>
 
-             {/* ACTION BUTTONS */}
-             <section className="flex flex-col sm:flex-row gap-4">
-               {/* Logo/Buy button */}
-               {!isRevealed ? (
-                 <Button
-                   className="w-full sm:w-44 h-14 bg-blue-700 hover:bg-blue-800 text-white flex items-center justify-center rounded-md shadow-md"
-                   onClick={handleLogoClick}
-                 >
-                   <img
-                     src="/logo.png"
-                     alt="Logo"
-                     className="h-12 w-auto object-contain"
-                   />
-                 </Button>
-               ) : (
-                 <Button
-                   className="w-full sm:w-44 h-14 bg-amber-400 hover:bg-amber-500 text-black text-sm font-bold uppercase rounded-md shadow-md"
-                 >
-                   КУПИТЬ
-                 </Button>
-               )}
+            {/* ACTION BUTTONS */}
+            <section className="flex flex-col sm:flex-row gap-4">
+              {/* Logo/Buy button */}
+              {!isRevealed ? (
+                <Button
+                  className="w-full sm:w-44 h-14 bg-blue-700 hover:bg-blue-800 text-white flex items-center justify-center rounded-md shadow-md"
+                  onClick={handleLogoClick}
+                >
+                  <img
+                    src="/logo.png"
+                    alt="Logo"
+                    className="h-12 w-auto object-contain"
+                  />
+                </Button>
+              ) : (
+                <Button className="w-full sm:w-44 h-14 bg-amber-400 hover:bg-amber-500 text-black text-sm font-bold uppercase rounded-md shadow-md">
+                  КУПИТЬ
+                </Button>
+              )}
 
-               {/* Click 30 button */}
-               <Button
-                 className="w-full sm:w-44 h-14 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold uppercase rounded-md shadow-md"
-                 onClick={handleClick30}
-               >
-                 КЛИК 30₽
-               </Button>
-             </section>
+              {/* Click 30 button */}
+              <Button
+                className="w-full sm:w-44 h-14 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold uppercase rounded-md shadow-md"
+                onClick={handleClick30}
+              >
+                КЛИК 30₽
+              </Button>
+            </section>
 
             {/* SHIPPING / EXTRA INFO */}
             <section className="text-xs text-muted-foreground">
@@ -209,12 +206,12 @@ const ProductDetail = () => {
         {/* Additional info block */}
         <div className="max-w-2xl text-sm text-muted-foreground leading-relaxed space-y-3">
           <p>
-            Все товары проверяются перед отправкой. В случае обнаружения дефектов,
-            вы можете связаться с нашей службой поддержки.
+            Все товары проверяются перед отправкой. В случае обнаружения
+            дефектов, вы можете связаться с нашей службой поддержки.
           </p>
           <p>
-            Условия доставки и возврата зависят от конкретного продавца и региона.
-            Пожалуйста, ознакомьтесь с правилами до совершения покупки.
+            Условия доставки и возврата зависят от конкретного продавца и
+            региона. Пожалуйста, ознакомьтесь с правилами до совершения покупки.
           </p>
         </div>
       </main>
