@@ -50,6 +50,11 @@ const Footer = () => {
             alt="Mastercard"
             className="h-8"
           />
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Mir-logo.SVG.svg"
+            alt="MIR"
+            className="h-8"
+          />
         </div>
 
         {/* Platform name + tagline */}
@@ -58,7 +63,7 @@ const Footer = () => {
             Ниже Некуда
           </div>
           <div className="text-muted-foreground">
-            Первая гемифицированная платформа низких цен
+            Первая геймифицированная платформа низких цен
           </div>
         </div>
       </div>

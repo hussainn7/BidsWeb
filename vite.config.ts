@@ -7,7 +7,7 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 5173,
-    allowedHosts: ["9h2g8n-5173.csb.app"],
+    allowedHosts: ["8vg6yc-5173.csb.app"],
   },
   plugins: [react()],
   resolve: {

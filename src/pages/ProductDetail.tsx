@@ -154,7 +154,7 @@ const ProductDetail = () => {
 
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                  Стартовая цена
+                  Минимальная цена
                 </span>
                 <span className="font-semibold text-foreground">2 844 ₽</span>
               </div>
