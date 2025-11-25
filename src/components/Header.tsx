@@ -23,9 +23,9 @@ const Header = () => {
   };
 
   return (
-    <header className="relative z-50 border-b border-border bg-background/80 backdrop-blur-md">
+    <header className="relative z-50 border-b border-border/50 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50">
       <div className="container mx-auto px-2 sm:px-4 relative">
-        <div className="flex items-center h-14 sm:h-16 border-b border-border/70">
+        <div className="flex items-center h-14 sm:h-16">
           {/* Logo left */}
           <Link
             to="/"
@@ -46,9 +46,9 @@ const Header = () => {
 
               const baseClasses =
                 "relative pb-1 text-sm font-medium tracking-normal transition-colors";
-              const activeClasses = "text-slate-900";
+              const activeClasses = "text-blue-600 font-semibold";
               const inactiveClasses =
-                "text-muted-foreground hover:text-slate-900";
+                "text-slate-700 hover:text-blue-600 transition-colors";
 
               if (isCatalog) {
                 return (
@@ -69,8 +69,8 @@ const Header = () => {
                       <span
                         className={`absolute left-0 -bottom-1 h-[2px] rounded-full transition-all duration-200 ${
                           active
-                            ? "w-full bg-[#A4C0FF]"
-                            : "w-0 bg-transparent group-hover:w-full"
+                            ? "w-full bg-blue-400"
+                            : "w-0 bg-transparent group-hover:w-full group-hover:bg-blue-200"
                         }`}
                       />
                     </Link>
@@ -94,7 +94,7 @@ const Header = () => {
                   {link.label}
                   <span
                     className={`absolute left-0 -bottom-1 h-[2px] rounded-full transition-all duration-200 ${
-                      active ? "w-full bg-[#C8D9FF]" : "w-0 bg-transparent"
+                      active ? "w-full bg-blue-400" : "w-0 bg-transparent group-hover:w-full group-hover:bg-blue-200"
                     }`}
                   />
                 </Link>
