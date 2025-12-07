@@ -41,6 +41,8 @@ const Account = () => {
   const [orders, setOrders] = useState<any[]>([]);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [customAmount, setCustomAmount] = useState("");
+  const [isProcessingTopUp, setIsProcessingTopUp] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -68,6 +70,23 @@ const Account = () => {
       setBalance(balanceData.balance);
       setBalanceHistory(historyData);
       setOrders(ordersData);
+      
+      // Reload balance when returning from payment callback
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('type') === 'balance_topup') {
+        // Reload balance after a short delay to allow webhook to process
+        setTimeout(async () => {
+          try {
+            const updatedBalance = await api.getBalance();
+            setBalance(updatedBalance.balance);
+            toast.success("Баланс успешно пополнен!");
+            // Clean URL
+            window.history.replaceState({}, '', '/account');
+          } catch (error) {
+            // Ignore errors
+          }
+        }, 2000);
+      }
     } catch (error: any) {
       toast.error(error.message || "Ошибка загрузки данных");
     } finally {
@@ -81,6 +100,38 @@ const Account = () => {
     api.setToken(null);
     toast.success("Вы успешно вышли из системы");
     navigate("/login");
+  };
+
+  const handleTopUp = async (amount: number) => {
+    if (amount <= 0) {
+      toast.error("Сумма должна быть больше 0");
+      return;
+    }
+
+    try {
+      setIsProcessingTopUp(true);
+      const result = await api.topUpBalance(amount);
+      
+      if (result.confirmationUrl) {
+        // Redirect to YooKassa payment page
+        window.location.href = result.confirmationUrl;
+      } else {
+        toast.error("Не удалось создать платеж");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Ошибка при создании платежа");
+    } finally {
+      setIsProcessingTopUp(false);
+    }
+  };
+
+  const handleCustomTopUp = () => {
+    const amount = parseFloat(customAmount);
+    if (isNaN(amount) || amount <= 0) {
+      toast.error("Введите корректную сумму");
+      return;
+    }
+    handleTopUp(amount);
   };
 
   if (!userEmail) {
@@ -148,7 +199,7 @@ const Account = () => {
                     <p className="text-sm text-muted-foreground mb-2">
                       Текущий баланс
                     </p>
-                    <p className="text-3xl font-bold text-foreground">0 ₽</p>
+                    <p className="text-3xl font-bold text-foreground">{balance.toLocaleString()} ₽</p>
                   </div>
 
                   {/* Быстрое пополнение */}
@@ -162,6 +213,8 @@ const Account = () => {
                           key={amount}
                           variant="outline"
                           className="h-14 sm:h-16 text-sm sm:text-base border-border/60 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 font-bold"
+                          onClick={() => handleTopUp(amount)}
+                          disabled={isProcessingTopUp}
                         >
                           {amount} ₽
                         </Button>
@@ -178,10 +231,17 @@ const Account = () => {
                       <input
                         type="number"
                         placeholder="Введите сумму"
+                        value={customAmount}
+                        onChange={(e) => setCustomAmount(e.target.value)}
                         className="flex-1 h-12 px-4 rounded-lg border border-border/60 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        disabled={isProcessingTopUp}
                       />
-                      <Button className="h-12 px-8 bg-emerald-500 hover:bg-emerald-600 text-white font-bold whitespace-nowrap">
-                        Пополнить
+                      <Button 
+                        className="h-12 px-8 bg-emerald-500 hover:bg-emerald-600 text-white font-bold whitespace-nowrap"
+                        onClick={handleCustomTopUp}
+                        disabled={isProcessingTopUp}
+                      >
+                        {isProcessingTopUp ? "Обработка..." : "Пополнить"}
                       </Button>
                     </div>
                   </div>

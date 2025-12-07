@@ -170,6 +170,29 @@ class ApiClient {
     return this.request<any[]>(`/balance/history${query}`);
   }
 
+  async topUpBalance(amount: number) {
+    return this.request<{
+      paymentId: string;
+      confirmationUrl: string;
+      amount: number;
+      isMock?: boolean;
+    }>('/balance/topup', {
+      method: 'POST',
+      body: JSON.stringify({ amount }),
+    });
+  }
+
+  async confirmTopUp(paymentId: string, amount?: number) {
+    return this.request<{
+      success: boolean;
+      balance?: number;
+      message?: string;
+    }>('/balance/topup/confirm', {
+      method: 'POST',
+      body: JSON.stringify({ paymentId, amount }),
+    });
+  }
+
   // Analytics
   async getOverallStats() {
     return this.request<any>('/analytics');

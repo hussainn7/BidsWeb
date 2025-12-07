@@ -7,6 +7,7 @@ export enum TransactionType {
   REFUND = 'refund',
   MANUAL_ADJUSTMENT = 'manual_adjustment',
   PAYOUT = 'payout',
+  BALANCE_TOPUP = 'balance_topup',
 }
 
 @Entity('balance_transactions')

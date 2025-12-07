@@ -46,10 +46,12 @@ export class YooKassaService {
       baseUrl = baseUrl.replace(/\/$/, '') + '/payment/callback';
     }
     
+    // Include amount in URL for mock payments so it can be retrieved
+    const separator = baseUrl.includes('?') ? '&' : '?';
     return {
       id: mockPaymentId,
       status: 'succeeded',
-      confirmationUrl: `${baseUrl}?payment_id=${mockPaymentId}&mock=true`,
+      confirmationUrl: `${baseUrl}${separator}payment_id=${mockPaymentId}&mock=true&amount=${amount}`,
     };
   }
 
@@ -87,7 +89,7 @@ export class YooKassaService {
     }
   }
 
-  async getPaymentStatus(paymentId: string) {
+  async getPaymentStatus(paymentId: string, amount?: number) {
     if (!this.isConfigured || !this.yooKassa || paymentId.startsWith('mock_')) {
       // Mock payment status - auto-approve mock payments
       this.logger.warn(`Mock payment status check: ${paymentId} - approved`);
@@ -95,7 +97,7 @@ export class YooKassaService {
         id: paymentId,
         status: 'succeeded',
         paid: true,
-        amount: { value: '0', currency: 'RUB' },
+        amount: { value: (amount || 0).toFixed(2), currency: 'RUB' },
       };
     }
 

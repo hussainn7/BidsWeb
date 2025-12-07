@@ -15,6 +15,7 @@ const PaymentCallback = () => {
       const orderId = searchParams.get('orderId');
       const clickId = searchParams.get('clickId');
       const productId = searchParams.get('productId');
+      const paymentType = searchParams.get('type'); // 'balance_topup', 'order', 'click'
 
       // For mock payments, payment_id might be in the URL
       const paymentIdFromUrl = searchParams.get('payment_id') || window.location.search.match(/payment_id=([^&]+)/)?.[1];
@@ -58,6 +59,20 @@ const PaymentCallback = () => {
               setStatus('error');
               setTimeout(() => navigate('/account'), 2000);
             }
+          } else if (paymentType === 'balance_topup') {
+            // Balance top-up - for mock payments, confirm it
+            try {
+              const amount = parseFloat(searchParams.get('amount') || '0');
+              await api.confirmTopUp(paymentId, amount);
+              toast.success("Баланс успешно пополнен!");
+              setStatus('success');
+              setTimeout(() => navigate('/account?type=balance_topup'), 1500);
+            } catch (error: any) {
+              console.error('Error confirming balance top-up:', error);
+              toast.error("Ошибка подтверждения пополнения баланса");
+              setStatus('error');
+              setTimeout(() => navigate('/account'), 2000);
+            }
           } else {
             toast.success("Платеж успешно обработан");
             setStatus('success');
@@ -80,6 +95,21 @@ const PaymentCallback = () => {
             await api.confirmOrderPayment(orderId, paymentId);
             toast.success("Заказ оплачен!");
             navigate('/account');
+          } else if (paymentType === 'balance_topup') {
+            // Balance top-up - for real payments, webhook will handle it
+            // But we can also try to confirm it here as a fallback
+            try {
+              const amount = parseFloat(searchParams.get('amount') || '0');
+              if (amount > 0) {
+                await api.confirmTopUp(paymentId, amount);
+              }
+              toast.success("Пополнение баланса обрабатывается...");
+              navigate('/account?type=balance_topup');
+            } catch (error: any) {
+              // If confirmation fails, webhook will handle it
+              toast.success("Пополнение баланса обрабатывается...");
+              navigate('/account?type=balance_topup');
+            }
           } else {
             toast.success("Платеж успешно обработан");
             navigate('/account');
