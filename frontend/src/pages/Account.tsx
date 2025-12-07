@@ -113,8 +113,14 @@ const Account = () => {
       const result = await api.topUpBalance(amount);
       
       if (result.confirmationUrl) {
+        // Ensure the URL is absolute
+        let redirectUrl = result.confirmationUrl;
+        if (!redirectUrl.startsWith('http://') && !redirectUrl.startsWith('https://')) {
+          // If relative URL, make it absolute
+          redirectUrl = window.location.origin + (redirectUrl.startsWith('/') ? redirectUrl : '/' + redirectUrl);
+        }
         // Redirect to YooKassa payment page
-        window.location.href = result.confirmationUrl;
+        window.location.href = redirectUrl;
       } else {
         toast.error("Не удалось создать платеж");
       }

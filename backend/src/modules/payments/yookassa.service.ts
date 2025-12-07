@@ -41,18 +41,45 @@ export class YooKassaService {
     // For mock payments, return URL should point to payment callback
     let baseUrl = returnUrl || this.configService.get<string>('YOOKASSA_RETURN_URL') || 'http://localhost:5173';
     
-    // If returnUrl doesn't include /payment/callback, add it
-    if (!baseUrl.includes('/payment/callback')) {
-      baseUrl = baseUrl.replace(/\/$/, '') + '/payment/callback';
+    // Parse the URL to handle query parameters properly
+    try {
+      const url = new URL(baseUrl);
+      // Ensure the path includes /payment/callback
+      if (!url.pathname.includes('/payment/callback')) {
+        url.pathname = url.pathname.replace(/\/$/, '') + '/payment/callback';
+      }
+      // Preserve existing query parameters (like type=balance_topup) and add new ones
+      url.searchParams.set('payment_id', mockPaymentId);
+      url.searchParams.set('mock', 'true');
+      url.searchParams.set('amount', amount.toString());
+      
+      const finalUrl = url.toString();
+      this.logger.log(`Mock payment confirmation URL: ${finalUrl}`);
+      
+      return {
+        id: mockPaymentId,
+        status: 'succeeded',
+        confirmationUrl: finalUrl,
+      };
+    } catch (error) {
+      this.logger.warn('Failed to parse URL, using fallback method', error);
+      // Fallback if URL parsing fails
+      // If returnUrl doesn't include /payment/callback, add it
+      if (!baseUrl.includes('/payment/callback')) {
+        baseUrl = baseUrl.replace(/\/$/, '') + '/payment/callback';
+      }
+      
+      // Include amount in URL for mock payments so it can be retrieved
+      const separator = baseUrl.includes('?') ? '&' : '?';
+      const finalUrl = `${baseUrl}${separator}payment_id=${mockPaymentId}&mock=true&amount=${amount}`;
+      this.logger.log(`Mock payment confirmation URL (fallback): ${finalUrl}`);
+      
+      return {
+        id: mockPaymentId,
+        status: 'succeeded',
+        confirmationUrl: finalUrl,
+      };
     }
-    
-    // Include amount in URL for mock payments so it can be retrieved
-    const separator = baseUrl.includes('?') ? '&' : '?';
-    return {
-      id: mockPaymentId,
-      status: 'succeeded',
-      confirmationUrl: `${baseUrl}${separator}payment_id=${mockPaymentId}&mock=true&amount=${amount}`,
-    };
   }
 
   async createPayment(amount: number, description: string, orderId: string, returnUrl?: string) {
