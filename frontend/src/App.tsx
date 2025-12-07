@@ -18,6 +18,7 @@ import Account from "./pages/Account";
 import Admin from "./pages/Admin";
 import PartnerDashboard from "./pages/PartnerDashboard";
 import PaymentCallback from "./pages/PaymentCallback";
+import Receipt from "./pages/Receipt";
 import NotFound from "./pages/NotFound";
 import Akszie from "./pages/Akszie";
 
@@ -45,6 +46,7 @@ const App = () => (
           <Route path="/admin" element={<Admin />} />
           <Route path="/partner" element={<PartnerDashboard />} />
           <Route path="/payment/callback" element={<PaymentCallback />} />
+          <Route path="/receipt/:orderId" element={<Receipt />} />
           <Route path="/akszie" element={<Akszie />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

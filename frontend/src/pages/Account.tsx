@@ -419,11 +419,11 @@ const Account = () => {
                         </div>
                       </div>
                     </div>
-                    {order.receiptUrl && (
+                    {order.status === 'paid' && (
                       <Button
                         variant="outline"
                         className="border-border/60 hover:bg-blue-600 hover:text-white hover:border-blue-600"
-                        onClick={() => window.open(order.receiptUrl, '_blank')}
+                        onClick={() => navigate(`/receipt/${order.id}`)}
                       >
                         Чек
                       </Button>
