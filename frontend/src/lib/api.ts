@@ -47,8 +47,10 @@ class ApiClient {
         localStorage.removeItem('userEmail');
         // Don't redirect here - let the component handle it
       }
-      const error = await response.json().catch(() => ({ message: 'An error occurred' }));
-      throw new Error(error.message || `HTTP error! status: ${response.status}`);
+      const error = await response.json().catch(() => ({ message: `HTTP error! status: ${response.status}` }));
+      // NestJS returns error in 'message' field, but sometimes it's nested
+      const errorMessage = error.message || error.error?.message || error.error || `HTTP error! status: ${response.status}`;
+      throw new Error(errorMessage);
     }
 
     return response.json();

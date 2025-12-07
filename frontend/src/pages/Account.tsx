@@ -306,9 +306,9 @@ const Account = () => {
                     </p>
                   </div>
                 ) : (
-                  orders.map((order) => (
+                  orders.map((order, index) => (
                   <div
-                    key={index}
+                    key={order.id || index}
                     className="rounded-lg border border-border/60 bg-slate-50/50 p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
                   >
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-4 flex-1">

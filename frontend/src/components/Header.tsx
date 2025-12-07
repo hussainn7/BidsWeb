@@ -1,11 +1,36 @@
 import { Search, ShoppingCart, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MegaMenu from "./MegaMenu";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    // Check if user is logged in
+    const token = localStorage.getItem('token');
+    setIsAuthenticated(!!token);
+    
+    // Listen for storage changes (when token is set/removed)
+    const handleStorageChange = () => {
+      const token = localStorage.getItem('token');
+      setIsAuthenticated(!!token);
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    // Also check periodically (in case token is set in same window)
+    const interval = setInterval(() => {
+      const token = localStorage.getItem('token');
+      setIsAuthenticated(!!token);
+    }, 1000);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
 
   const navLinks = [
     { path: "/", label: "Каталог" },
@@ -115,7 +140,7 @@ const Header = () => {
               <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>
             <Link
-              to="/login"
+              to={isAuthenticated ? "/account" : "/login"}
               className="rounded-full p-1 sm:p-1.5 hover:bg-[#C8D9FF]/40 hover:text-slate-900 transition-colors"
             >
               <User className="w-4 h-4 sm:w-5 sm:h-5" />

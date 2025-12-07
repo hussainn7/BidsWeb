@@ -65,7 +65,8 @@ const ProductDetail = () => {
       if (result.isMock || result.confirmationUrl?.includes('mock=true')) {
         // Mock payment is already approved - just refresh and show success
         toast.success("Клик подтвержден! +40₽ добавлено на баланс");
-        queryClient.invalidateQueries({ queryKey: ['product', id] });
+        // Force refetch with current token to get updated price visibility
+        await queryClient.refetchQueries({ queryKey: ['product', id] });
         await loadBalance();
         setIsProcessingClick(false);
       } else if (result.confirmationUrl) {
@@ -82,6 +83,10 @@ const ProductDetail = () => {
       if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
         toast.error("Пожалуйста, войдите в систему");
         navigate('/login');
+      } else if (error.message?.includes('already at minimum') || error.message?.includes('минимуме')) {
+        toast.error("Цена товара уже достигла минимума. Клики больше недоступны.");
+      } else if (error.message?.includes('already sold') || error.message?.includes('продан')) {
+        toast.error("Товар уже продан");
       } else {
         toast.error(error.message || "Ошибка при клике");
       }
@@ -207,12 +212,14 @@ const ProductDetail = () => {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                  Минимальная цена
-                </span>
-                <span className="font-semibold text-foreground">{minPrice.toLocaleString()} ₽</span>
-              </div>
+              {priceVisible && (
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                    Минимальная цена
+                  </span>
+                  <span className="font-semibold text-foreground">{minPrice.toLocaleString()} ₽</span>
+                </div>
+              )}
 
               {balance > 0 && (
                 <div className="flex items-center justify-between">
