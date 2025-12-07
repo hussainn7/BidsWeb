@@ -15,7 +15,7 @@ import { User } from '../users/entities/user.entity';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET') || 'your-secret-key',
+          secret: configService.get<string>('JWT_SECRET') || process.env.JWT_SECRET || '',
         signOptions: { expiresIn: '7d' },
       }),
       inject: [ConfigService],

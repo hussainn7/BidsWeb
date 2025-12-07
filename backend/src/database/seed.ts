@@ -25,13 +25,14 @@ async function seed() {
   const productRepository = dataSource.getRepository(Product);
 
   // Create admin user
-  const adminEmail = 'admin@example.com';
+  const adminEmail = process.env.SEED_ADMIN_EMAIL || 'admin@example.com';
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD || 'admin123';
   let admin = await userRepository.findOne({ where: { email: adminEmail } });
   
   if (!admin) {
     admin = userRepository.create({
       email: adminEmail,
-      password: await bcrypt.hash('admin123', 10),
+      password: await bcrypt.hash(adminPassword, 10),
       fullName: 'Admin User',
       role: UserRole.ADMIN,
       balance: 0,
@@ -41,13 +42,14 @@ async function seed() {
   }
 
   // Create partner user
-  const partnerEmail = 'partner@example.com';
+  const partnerEmail = process.env.SEED_PARTNER_EMAIL || 'partner@example.com';
+  const partnerPassword = process.env.SEED_PARTNER_PASSWORD || 'partner123';
   let partner = await userRepository.findOne({ where: { email: partnerEmail } });
   
   if (!partner) {
     partner = userRepository.create({
       email: partnerEmail,
-      password: await bcrypt.hash('partner123', 10),
+      password: await bcrypt.hash(partnerPassword, 10),
       fullName: 'Partner User',
       role: UserRole.PARTNER,
       balance: 0,

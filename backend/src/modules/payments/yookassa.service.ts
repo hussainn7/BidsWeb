@@ -123,8 +123,9 @@ export class YooKassaService {
     if (!this.isConfigured || paymentId.startsWith('mock_')) {
       // Mock receipt for development
       this.logger.warn(`Mock receipt created for payment: ${paymentId}`);
+      const frontendUrl = this.configService.get<string>('FRONTEND_URL') || process.env.FRONTEND_URL || 'http://localhost:5173';
       return {
-        receiptUrl: `http://localhost:5173/payment/callback?payment_id=${paymentId}&mock=true`,
+        receiptUrl: `${frontendUrl}/payment/callback?payment_id=${paymentId}&mock=true`,
       };
     }
 
