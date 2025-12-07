@@ -73,13 +73,21 @@ const Account = () => {
       
       // Reload balance when returning from payment callback
       const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('type') === 'balance_topup') {
+      if (urlParams.get('type') === 'balance_topup' || urlParams.get('refresh') === 'balance') {
         // Reload balance after a short delay to allow webhook to process
         setTimeout(async () => {
           try {
-            const updatedBalance = await api.getBalance();
+            const [updatedBalance, updatedHistory, updatedOrders] = await Promise.all([
+              api.getBalance().catch(() => ({ balance: balance })),
+              api.getBalanceHistory().catch(() => historyData),
+              api.getOrders().catch(() => ordersData),
+            ]);
             setBalance(updatedBalance.balance);
-            toast.success("Баланс успешно пополнен!");
+            setBalanceHistory(updatedHistory);
+            setOrders(updatedOrders);
+            if (urlParams.get('type') === 'balance_topup') {
+              toast.success("Баланс успешно пополнен!");
+            }
             // Clean URL
             window.history.replaceState({}, '', '/account');
           } catch (error) {

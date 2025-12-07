@@ -94,7 +94,8 @@ const PaymentCallback = () => {
           else if (orderId) {
             await api.confirmOrderPayment(orderId, paymentId);
             toast.success("Заказ оплачен!");
-            navigate('/account');
+            // Refresh balance by navigating with query param
+            navigate('/account?refresh=balance');
           } else if (paymentType === 'balance_topup') {
             // Balance top-up - for real payments, webhook will handle it
             // But we can also try to confirm it here as a fallback
