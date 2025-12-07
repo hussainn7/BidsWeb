@@ -56,72 +56,105 @@ export class OrdersService {
 
     const amountToPay = currentPrice - balanceToUse;
 
-    // Lock the product
-    product.isSold = true;
-    await this.productsRepository.save(product);
+    // Use transaction to ensure atomicity of order creation and balance deduction
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    // Generate order number
-    const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+    try {
+      // Lock the product
+      product.isSold = true;
+      await queryRunner.manager.save(product);
 
-    // Create order
-    const order = this.ordersRepository.create({
-      orderNumber,
-      amount: currentPrice,
-      balanceUsed: balanceToUse,
-      status: OrderStatus.PENDING,
-      user: { id: userId },
-      product: { id: product.id },
-    });
+      // Generate order number
+      const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
-    const savedOrder = await this.ordersRepository.save(order);
+      // Create order
+      const order = queryRunner.manager.create(Order, {
+        orderNumber,
+        amount: currentPrice,
+        balanceUsed: balanceToUse,
+        status: OrderStatus.PENDING,
+        user: { id: userId },
+        product: { id: product.id },
+      });
 
-    // Deduct balance if used
-    if (balanceToUse > 0) {
-      await this.balanceService.deductBalance(
-        userId,
-        balanceToUse,
-        TransactionType.ORDER_PAYMENT,
-        savedOrder.id,
-        `Payment for order ${orderNumber}`,
-      );
-    }
+      const savedOrder = await queryRunner.manager.save(order);
 
-    // Create payment if amount to pay > 0
-    let payment: { id: string; confirmationUrl?: string } | null = null;
-    if (amountToPay > 0) {
-      const returnUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment/callback?orderId=${savedOrder.id}`;
-      
-      payment = await this.yooKassaService.createPayment(
-        amountToPay,
-        `Purchase: ${product.name}`,
-        savedOrder.id,
-        returnUrl,
-      );
+      // Deduct balance if used (within the same transaction)
+      if (balanceToUse > 0) {
+        const userInTransaction = await queryRunner.manager.findOne(User, { where: { id: userId } });
+        if (!userInTransaction) {
+          throw new NotFoundException('User not found');
+        }
 
-      savedOrder.paymentId = payment.id;
-      await this.ordersRepository.save(savedOrder);
-      
-      // Add orderId to confirmation URL
-      // For mock payments, the URL already has payment_id and mock=true
-      // For real YooKassa, payment_id will be added by YooKassa redirect
-      if (payment.confirmationUrl) {
-        const separator = payment.confirmationUrl.includes('?') ? '&' : '?';
-        payment.confirmationUrl = `${payment.confirmationUrl}${separator}orderId=${savedOrder.id}`;
+        const balanceBefore = Number(userInTransaction.balance);
+        if (balanceBefore < balanceToUse) {
+          throw new BadRequestException(`Insufficient balance. Available: ${balanceBefore}₽, Required: ${balanceToUse}₽`);
+        }
+
+        const balanceAfter = balanceBefore - balanceToUse;
+        userInTransaction.balance = balanceAfter;
+        await queryRunner.manager.save(userInTransaction);
+
+        // Create balance transaction record
+        const balanceTransaction = queryRunner.manager.create(BalanceTransaction, {
+          type: TransactionType.ORDER_PAYMENT,
+          amount: -balanceToUse,
+          balanceBefore,
+          balanceAfter,
+          referenceId: savedOrder.id,
+          description: `Payment for order ${orderNumber}`,
+          user: { id: userId },
+        });
+        await queryRunner.manager.save(balanceTransaction);
+
+        // Log balance deduction
+        console.log(`[Order ${orderNumber}] Balance deducted: ${balanceBefore}₽ → ${balanceAfter}₽ (deducted ${balanceToUse}₽)`);
       }
-    } else {
-      // If fully paid with balance, mark as paid immediately
-      savedOrder.status = OrderStatus.PAID;
-      savedOrder.paidAt = new Date();
-      await this.ordersRepository.save(savedOrder);
-    }
 
-    return {
-      order: savedOrder,
-      payment: payment ? {
-        id: payment.id,
-        confirmationUrl: payment.confirmationUrl,
-      } : null,
-    };
+      await queryRunner.commitTransaction();
+
+      // Create payment if amount to pay > 0 (outside transaction since it's external)
+      let payment: { id: string; confirmationUrl?: string } | null = null;
+      if (amountToPay > 0) {
+        const returnUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment/callback?orderId=${savedOrder.id}`;
+        
+        payment = await this.yooKassaService.createPayment(
+          amountToPay,
+          `Purchase: ${product.name}`,
+          savedOrder.id,
+          returnUrl,
+        );
+
+        savedOrder.paymentId = payment.id;
+        await this.ordersRepository.save(savedOrder);
+        
+        // Add orderId to confirmation URL
+        if (payment.confirmationUrl) {
+          const separator = payment.confirmationUrl.includes('?') ? '&' : '?';
+          payment.confirmationUrl = `${payment.confirmationUrl}${separator}orderId=${savedOrder.id}`;
+        }
+      } else {
+        // If fully paid with balance, mark as paid immediately
+        savedOrder.status = OrderStatus.PAID;
+        savedOrder.paidAt = new Date();
+        await this.ordersRepository.save(savedOrder);
+      }
+
+      return {
+        order: savedOrder,
+        payment: payment ? {
+          id: payment.id,
+          confirmationUrl: payment.confirmationUrl,
+        } : null,
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async confirmPayment(orderId: string, paymentId: string) {
@@ -135,6 +168,11 @@ export class OrdersService {
     }
 
     if (order.status === OrderStatus.PAID) {
+      // Verify balance was deducted (for logging/debugging)
+      if (order.balanceUsed > 0) {
+        const user = await this.usersRepository.findOne({ where: { id: order.user.id } });
+        console.log(`[Order ${order.orderNumber}] Already paid. Balance used: ${order.balanceUsed}₽, User balance: ${user?.balance}₽`);
+      }
       return order; // Already processed
     }
 
@@ -148,6 +186,12 @@ export class OrdersService {
       await queryRunner.startTransaction();
 
       try {
+        // Verify balance was already deducted at order creation
+        if (order.balanceUsed > 0) {
+          const userInTransaction = await queryRunner.manager.findOne(User, { where: { id: order.user.id } });
+          console.log(`[Order ${order.orderNumber}] Payment confirmed. Balance was deducted at creation: ${order.balanceUsed}₽. Current user balance: ${userInTransaction?.balance}₽`);
+        }
+
         // Update order status
         order.status = OrderStatus.PAID;
         order.paidAt = new Date();
@@ -169,6 +213,8 @@ export class OrdersService {
         await queryRunner.manager.save(order);
 
         await queryRunner.commitTransaction();
+
+        console.log(`[Order ${order.orderNumber}] Payment confirmed and receipt generated`);
 
         // Note: Partner payout will be handled by CRON job
         return order;
