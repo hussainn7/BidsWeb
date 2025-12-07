@@ -15,3 +15,4 @@ import { BalanceTransaction } from '../balance/entities/balance-transaction.enti
 })
 export class AnalyticsModule {}
 
+

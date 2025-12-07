@@ -50,3 +50,4 @@ All frontend URL references use environment variables:
 ### No Breaking Changes:
 Moving the frontend to a separate folder did **not** break the backend. All references are environment-based and will work regardless of frontend location.
 
+

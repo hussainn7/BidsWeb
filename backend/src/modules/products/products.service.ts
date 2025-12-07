@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Product } from './entities/product.entity';
@@ -8,10 +8,12 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { YooKassaService } from '../payments/yookassa.service';
 import { BalanceService } from '../balance/balance.service';
-import { TransactionType } from '../balance/entities/balance-transaction.entity';
+import { TransactionType, BalanceTransaction } from '../balance/entities/balance-transaction.entity';
 
 @Injectable()
 export class ProductsService {
+  private readonly logger = new Logger(ProductsService.name);
+
   constructor(
     @InjectRepository(Product)
     private productsRepository: Repository<Product>,
@@ -67,6 +69,14 @@ export class ProductsService {
       throw new NotFoundException('Partner not found');
     }
 
+    // Validate that price is greater than minPrice
+    const price = Number(createProductDto.price);
+    const minPrice = Number(createProductDto.minPrice);
+    
+    if (price <= minPrice) {
+      throw new BadRequestException(`Product price (${price}₽) must be greater than minimum price (${minPrice}₽)`);
+    }
+
     const product = this.productsRepository.create({
       ...createProductDto,
       partner: partner,
@@ -106,8 +116,33 @@ export class ProductsService {
       throw new BadRequestException('Product is already sold');
     }
 
-    if (product.price <= product.minPrice) {
-      throw new BadRequestException('Product price is already at minimum');
+    // Convert to numbers for proper comparison (decimal types can cause issues)
+    const currentPrice = Number(product.price);
+    const minPrice = Number(product.minPrice);
+    
+    // Check if this user has already clicked (price is already revealed for them)
+    const hasUserClicked = await this.clicksRepository.findOne({
+      where: { 
+        product: { id: productId }, 
+        user: { id: userId }, 
+        isPaid: true 
+      },
+    });
+    
+    this.logger.debug(`Click attempt - Product: ${product.name}, Current Price: ${currentPrice}, Min Price: ${minPrice}, Has User Clicked: ${!!hasUserClicked}`);
+    
+    // Only check minimum price constraint if user has already clicked (price is revealed)
+    // Allow first click to reveal the price, then check minimum for subsequent clicks
+    if (hasUserClicked && currentPrice <= minPrice) {
+      this.logger.warn(`Product ${product.id} price (${currentPrice}) is at or below minimum (${minPrice}) after user's previous click`);
+      throw new BadRequestException(`Product price (${currentPrice}₽) is already at minimum (${minPrice}₽). No more clicks available.`);
+    }
+    
+    // Also validate that starting price is valid (should be > minPrice)
+    // This prevents products from being created incorrectly, but allows first click
+    if (product.clickCount === 0 && currentPrice <= minPrice) {
+      this.logger.error(`Product ${product.id} has invalid starting price (${currentPrice}) <= minPrice (${minPrice})`);
+      throw new BadRequestException(`Product has invalid price configuration. Starting price must be greater than minimum price.`);
     }
 
     const user = await this.usersRepository.findOne({ where: { id: userId } });
@@ -122,8 +157,9 @@ export class ProductsService {
 
     try {
       const priceBefore = Number(product.price);
+      const minPrice = Number(product.minPrice);
       const priceReduction = 30;
-      const newPrice = Math.max(Number(product.minPrice), priceBefore - priceReduction);
+      const newPrice = Math.max(minPrice, priceBefore - priceReduction);
       const priceAfter = newPrice;
 
       // Create click record first (without paymentId)
@@ -159,14 +195,26 @@ export class ProductsService {
         savedClick.isPaid = true;
         await queryRunner.manager.save(savedClick);
         
-        // Add 40 ₽ to user balance
-        await this.balanceService.addBalance(
-          userId,
-          40,
-          TransactionType.CLICK_REWARD,
-          savedClick.id,
-          `Reward for clicking on ${product.name}`,
-        );
+        // Add 40 ₽ to user balance within the same transaction
+        const user = await queryRunner.manager.findOne(User, { where: { id: userId } });
+        if (user) {
+          const balanceBefore = Number(user.balance);
+          const balanceAfter = balanceBefore + 40;
+          user.balance = balanceAfter;
+          await queryRunner.manager.save(user);
+          
+          // Create balance transaction record
+          const balanceTransaction = queryRunner.manager.create(BalanceTransaction, {
+            type: TransactionType.CLICK_REWARD,
+            amount: 40,
+            balanceBefore,
+            balanceAfter,
+            referenceId: savedClick.id,
+            description: `Reward for clicking on ${product.name}`,
+            user: { id: userId },
+          });
+          await queryRunner.manager.save(balanceTransaction);
+        }
       }
 
       // Update product price
@@ -179,8 +227,11 @@ export class ProductsService {
       // Add clickId and productId to confirmation URL
       // For mock payments, the URL already has payment_id and mock=true
       // For real YooKassa, payment_id will be added by YooKassa redirect
-      const separator = payment.confirmationUrl?.includes('?') ? '&' : '?';
-      const confirmationUrl = `${payment.confirmationUrl}${separator}clickId=${savedClick.id}&productId=${productId}`;
+      let confirmationUrl: string | null = null;
+      if (payment.confirmationUrl) {
+        const separator = payment.confirmationUrl.includes('?') ? '&' : '?';
+        confirmationUrl = `${payment.confirmationUrl}${separator}clickId=${savedClick.id}&productId=${productId}`;
+      }
 
       return {
         clickId: savedClick.id,
@@ -193,6 +244,7 @@ export class ProductsService {
       };
     } catch (error) {
       await queryRunner.rollbackTransaction();
+      this.logger.error(`Error in clickProduct for product ${productId}, user ${userId}: ${error.message}`, error.stack);
       throw error;
     } finally {
       await queryRunner.release();

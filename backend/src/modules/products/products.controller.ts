@@ -14,6 +14,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ClickProductDto } from './dto/click-product.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/optional-jwt.guard';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { UserRole } from '../users/entities/user.entity';
@@ -27,6 +28,7 @@ export class ProductsController {
     return this.productsService.findAll(isActive === 'true');
   }
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Get(':id')
   async findOne(@Param('id') id: string, @Request() req) {
     const userId = req.user?.id;

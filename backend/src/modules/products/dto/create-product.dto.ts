@@ -24,3 +24,4 @@ export class CreateProductDto {
   isActive?: boolean;
 }
 
+
